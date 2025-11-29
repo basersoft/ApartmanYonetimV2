@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_dashboard"
+        android:icon="@android:drawable/ic_menu_myplaces"
+        android:title="Ana Sayfa" />
+    <item
+        android:id="@+id/nav_duyurular"
+        android:icon="@android:drawable/ic_menu_agenda"
+        android:title="Duyurular" />
+    <item
+        android:id="@+id/nav_aidat"
+        android:icon="@android:drawable/ic_menu_manage"
+        android:title="Aidat" />
+</menu>

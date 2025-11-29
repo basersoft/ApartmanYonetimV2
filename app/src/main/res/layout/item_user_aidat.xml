@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Üst Bilgi -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvUserName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Kullanıcı Adı"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#2c3e50" />
+
+                <TextView
+                    android:id="@+id/tvApartment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Daire"
+                    android:textSize="12sp"
+                    android:textColor="#666"
+                    android:layout_marginTop="2dp" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="4dp"
+                android:textColor="#fff"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:background="#f39c12"
+                android:text="BEKLİYOR" />
+        </LinearLayout>
+
+        <!-- İstatistikler -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Toplam"
+                    android:textSize="11sp"
+                    android:textColor="#666" />
+
+                <TextView
+                    android:id="@+id/tvTotalAmount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="₺0.00"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="#2c3e50" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Ödenen"
+                    android:textSize="11sp"
+                    android:textColor="#666" />
+
+                <TextView
+                    android:id="@+id/tvPaidAmount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="₺0.00"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="#27ae60" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Bekleyen"
+                    android:textSize="11sp"
+                    android:textColor="#666" />
+
+                <TextView
+                    android:id="@+id/tvPendingAmount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="₺0.00"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="#f39c12" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Geciken"
+                    android:textSize="11sp"
+                    android:textColor="#666" />
+
+                <TextView
+                    android:id="@+id/tvOverdueAmount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="₺0.00"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="#e74c3c" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Gecikme Zammı -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            android:paddingTop="8dp"
+            android:background="#f8f9fa"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp"
+            android:backgroundTint="#fff3cd">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Gecikme Zammı:"
+                android:textSize="11sp"
+                android:textColor="#856404" />
+
+            <TextView
+                android:id="@+id/tvLateFee"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="₺0.00"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textColor="#856404" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

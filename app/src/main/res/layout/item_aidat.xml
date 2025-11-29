@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@android:color/white"
+    android:layout_margin="8dp"
+    android:elevation="2dp">
+    <TextView
+        android:id="@+id/tvKullanici"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Kullanıcı: Ahmet Yılmaz (ahmet@example.com)"
+        android:textSize="12sp"
+        android:textColor="#666"
+        android:layout_marginTop="4dp"
+        android:visibility="gone" />
+    <!-- Ay Bilgisi -->
+    <TextView
+        android:id="@+id/tvTarih"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ocak 2024"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#2c3e50" />
+
+    <!-- Tutar -->
+    <TextView
+        android:id="@+id/tvTutar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="₺500,00"
+        android:textSize="16sp"
+        android:textColor="#34495e"
+        android:layout_marginTop="4dp" />
+
+    <!-- Son Tarih -->
+    <TextView
+        android:id="@+id/tvSonTarih"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Son Tarih: 25 Ocak 2024"
+        android:textSize="12sp"
+        android:textColor="#7f8c8d"
+        android:layout_marginTop="4dp" />
+
+    <!-- Durum -->
+    <TextView
+        android:id="@+id/tvDurum"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ÖDENDİ"
+        android:textSize="12sp"
+        android:textColor="@android:color/white"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="4dp"
+        android:layout_marginTop="8dp"
+        android:background="#2ecc71" />
+
+</LinearLayout>

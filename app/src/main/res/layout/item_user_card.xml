@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    android:background="@drawable/card_background"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:elevation="4dp">
+
+    <!-- Üst Bilgi -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- Kullanıcı Bilgileri -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvUserName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Kullanıcı Adı"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#2c3e50" />
+
+            <TextView
+                android:id="@+id/tvUserEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="email@example.com"
+                android:textSize="12sp"
+                android:textColor="#7f8c8d"
+                android:layout_marginTop="2dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="4dp">
+
+                <TextView
+                    android:id="@+id/tvUserApartment"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="A-101"
+                    android:textSize="12sp"
+                    android:textColor="#34495e"
+                    android:textStyle="bold"
+                    android:background="#e8f4fd"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="2dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Kullanıcı Tipi Badge -->
+        <TextView
+            android:id="@+id/tvUserType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sakin"
+            android:textSize="10sp"
+            android:textColor="@android:color/white"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp"
+            android:background="@drawable/badge_resident" />
+
+    </LinearLayout>
+
+    <!-- Alt Bilgi -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="12dp">
+
+        <TextView
+            android:id="@+id/tvResidentType"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Ev Sahibi"
+            android:textSize="10sp"
+            android:textColor="#27ae60" />
+
+        <TextView
+            android:id="@+id/tvDuesResponsibility"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Öder"
+            android:textSize="10sp"
+            android:textColor="#e74c3c"
+            android:gravity="center" />
+
+        <TextView
+            android:id="@+id/tvResidingStatus"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Oturuyor"
+            android:textSize="10sp"
+            android:textColor="#3498db"
+            android:gravity="end" />
+
+    </LinearLayout>
+
+</LinearLayout>

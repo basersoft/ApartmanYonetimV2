@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="@drawable/dialog_background">
+
+    <!-- Başlık -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="👤 Kullanıcı İşlemleri"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#2c3e50"
+        android:gravity="center"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Kullanıcı Bilgileri -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/card_background"
+        android:padding="12dp"
+        android:layout_marginBottom="20dp">
+
+        <TextView
+            android:id="@+id/tvDialogUserName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ad Soyad"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#2c3e50" />
+
+        <TextView
+            android:id="@+id/tvDialogUserEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="email@example.com"
+            android:textSize="12sp"
+            android:textColor="#7f8c8d"
+            android:layout_marginTop="4dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:id="@+id/tvDialogApartment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="A-101"
+                android:textSize="12sp"
+                android:textColor="#34495e"
+                android:textStyle="bold"
+                android:background="#e8f4fd"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="2dp" />
+
+            <TextView
+                android:id="@+id/tvDialogUserType"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sakin"
+                android:textSize="10sp"
+                android:textColor="@android:color/white"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/badge_resident" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- İşlem Butonları -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:divider="@drawable/divider_horizontal"
+        android:showDividers="middle">
+
+        <!-- Detayları Gör Butonu -->
+        <LinearLayout
+            android:id="@+id/btnDetails"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true">
+
+            <TextView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:text="ℹ️"
+                android:textSize="16sp"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Detayları Gör"
+                android:textSize="14sp"
+                android:textColor="#2c3e50"
+                android:layout_marginStart="12dp" />
+
+            <TextView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:text="›"
+                android:textSize="16sp"
+                android:textColor="#bdc3c7"
+                android:gravity="center" />
+
+        </LinearLayout>
+
+        <!-- Düzenle Butonu -->
+        <LinearLayout
+            android:id="@+id/btnEdit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true">
+
+            <TextView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:text="✏️"
+                android:textSize="16sp"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Düzenle"
+                android:textSize="14sp"
+                android:textColor="#2c3e50"
+                android:layout_marginStart="12dp" />
+
+            <TextView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:text="›"
+                android:textSize="16sp"
+                android:textColor="#bdc3c7"
+                android:gravity="center" />
+
+        </LinearLayout>
+
+        <!-- Sil Butonu -->
+        <LinearLayout
+            android:id="@+id/btnDelete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true">
+
+            <TextView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:text="🗑️"
+                android:textSize="16sp"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Sil"
+                android:textSize="14sp"
+                android:textColor="#e74c3c"
+                android:layout_marginStart="12dp" />
+
+            <TextView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:text="›"
+                android:textSize="16sp"
+                android:textColor="#bdc3c7"
+                android:gravity="center" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- İptal Butonu -->
+    <Button
+        android:id="@+id/btnCancel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="İptal"
+        android:textColor="#7f8c8d"
+        android:background="@android:color/transparent"
+        android:textStyle="bold"
+        android:layout_marginTop="16dp" />
+
+</LinearLayout>

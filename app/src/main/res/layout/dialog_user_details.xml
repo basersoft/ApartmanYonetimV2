@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@drawable/dialog_background">
+
+    <!-- Başlık -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="📋 Kullanıcı Detayları"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#2c3e50"
+        android:gravity="center"
+        android:layout_marginBottom="20dp" />
+
+    <!-- Kullanıcı Bilgileri -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/card_background"
+        android:padding="16dp">
+
+        <!-- Ad Soyad -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingVertical="8dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="👤 Ad Soyad:"
+                android:textColor="#7f8c8d"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvDetailName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Ad Soyad"
+                android:textColor="#2c3e50"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:gravity="end" />
+
+        </LinearLayout>
+
+        <!-- E-posta -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingVertical="8dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="📧 E-posta:"
+                android:textColor="#7f8c8d"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvDetailEmail"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="email@example.com"
+                android:textColor="#2c3e50"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:gravity="end" />
+
+        </LinearLayout>
+
+        <!-- Telefon -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingVertical="8dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="📞 Telefon:"
+                android:textColor="#7f8c8d"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvDetailPhone"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="555-1234"
+                android:textColor="#2c3e50"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:gravity="end" />
+
+        </LinearLayout>
+
+        <!-- Daire -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingVertical="8dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="🏠 Daire:"
+                android:textColor="#7f8c8d"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvDetailApartment"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="A-101"
+                android:textColor="#2c3e50"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:gravity="end" />
+
+        </LinearLayout>
+
+        <!-- Kullanıcı Tipi -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingVertical="8dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="🔧 Kullanıcı Tipi:"
+                android:textColor="#7f8c8d"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvDetailUserType"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Sakin"
+                android:textColor="#2c3e50"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:gravity="end" />
+
+        </LinearLayout>
+
+        <!-- Oturan Tipi -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingVertical="8dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="👥 Oturan Tipi:"
+                android:textColor="#7f8c8d"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvDetailResidentType"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Ev Sahibi"
+                android:textColor="#2c3e50"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:gravity="end" />
+
+        </LinearLayout>
+
+        <!-- Aidat Sorumluluğu -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingVertical="8dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="💰 Aidat Sorumluluğu:"
+                android:textColor="#7f8c8d"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvDetailDues"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Öder"
+                android:textColor="#2c3e50"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:gravity="end" />
+
+        </LinearLayout>
+
+        <!-- Oturma Durumu -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingVertical="8dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="🏠 Oturma Durumu:"
+                android:textColor="#7f8c8d"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvDetailResiding"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Oturuyor"
+                android:textColor="#2c3e50"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:gravity="end" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Tamam Butonu -->
+    <Button
+        android:id="@+id/btnOk"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Tamam"
+        android:textColor="@android:color/white"
+        android:background="#3498db"
+        android:textStyle="bold"
+        android:layout_marginTop="20dp" />
+
+</LinearLayout>

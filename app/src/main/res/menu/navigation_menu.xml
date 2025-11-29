@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_dashboard"
+        android:icon="@android:drawable/ic_menu_myplaces"
+        android:title="Ana Sayfa" />
+    <item
+        android:id="@+id/nav_duyurular"
+        android:icon="@android:drawable/ic_menu_agenda"
+        android:title="Duyurular" />
+    <item
+        android:id="@+id/nav_aidat"
+        android:icon="@android:drawable/ic_menu_manage"
+        android:title="Aidat Takibi" />
+    <item
+        android:id="@+id/nav_sikayetler"
+        android:icon="@android:drawable/ic_menu_info_details"
+        android:title="Şikayetler" />
+    <item
+        android:id="@+id/nav_yeni_sikayet"
+        android:icon="@android:drawable/ic_menu_add"
+        android:title="Yeni Şikayet" />
+    <item
+        android:id="@+id/nav_bakim"
+        android:icon="@android:drawable/ic_menu_edit"
+        android:title="Bakım Talepleri" />
+    <item
+        android:id="@+id/nav_settings"
+        android:icon="@android:drawable/ic_menu_preferences"
+        android:title="Ayarlar" />
+    <item
+        android:id="@+id/nav_logout"
+        android:icon="@android:drawable/ic_lock_power_off"
+        android:title="Çıkış Yap" />
+</menu>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<!-- Diğer string'leriniz varsa burada kalacak -->
+<!-- Eski string'leri silmeyin, sadece yeni ekleyin -->
+<string name="app_name">Apartman Yonetim</string>
+<string name="navigation_drawer_open">Menüyü aç</string>
+<string name="navigation_drawer_close">Menüyü kapat</string>
+
+<!-- Diğer mevcut string'leriniz... -->
+    <string-array name="user_types">
+        <item>Sakin</item>
+        <item>Yönetici</item>
+        <item>Admin</item>
+    </string-array>
+
+    <string-array name="resident_types">
+        <item>Ev Sahibi</item>
+        <item>Kiracı</item>
+    </string-array>
+
+    <string-array name="dues_responsibility">
+        <item>Aidat Öder</item>
+        <item>Aidat Ödemez</item>
+    </string-array>
+
+    <!-- User Management Strings -->
+    <string name="user_management_title">Kullanıcı Yönetimi</string>
+    <string name="search_users">Kullanıcı ara...</string>
+    <string name="add_user">Kullanıcı Ekle</string>
+    <string name="no_users_found">Kullanıcı bulunamadı</string>
+    <string name="user_details">Kullanıcı Detayları</string>
+    <string name="close">Kapat</string>
+    <string name="edit">Düzenle</string>
+    <string name="delete">Sil</string>
+    <string name="delete_user_confirmation">%s kullanıcısını silmek istediğinizden emin misiniz?</string>
+    <string name="cancel">İptal</string>
+</resources>

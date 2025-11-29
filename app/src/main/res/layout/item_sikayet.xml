@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardSikayet"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    android:clickable="true"
+    android:focusable="true"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    app:cardUseCompatPadding="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- BASİT GÖRÜNÜM (HER ZAMAN GÖRÜNÜR) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvSikayetBaslik"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Başlık"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#2C3E50" />
+
+                <TextView
+                    android:id="@+id/tvSikayetKategori"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Kategori"
+                    android:textSize="12sp"
+                    android:textColor="#7F8C8D"
+                    android:layout_marginTop="2dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp">
+
+                    <TextView
+                        android:id="@+id/tvSikayetDurum"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Durum"
+                        android:textSize="12sp"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="4dp"
+                        android:background="@drawable/bg_durum_beklemede"
+                        android:textColor="@android:color/white" />
+
+                    <TextView
+                        android:id="@+id/tvSikayetTarih"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tarih"
+                        android:textSize="12sp"
+                        android:textColor="#7F8C8D"
+                        android:layout_marginStart="8dp"
+                        android:gravity="center_vertical" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Açılır/Kapanır Ok İkonu -->
+            <ImageView
+                android:id="@+id/imageExpand"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_expand_more"
+                android:rotation="0"
+                android:contentDescription="Detayları göster" />
+
+        </LinearLayout>
+
+        <!-- DETAYLI GÖRÜNÜM (AÇILINCA GÖRÜNÜR) -->
+        <LinearLayout
+            android:id="@+id/layoutDetay"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:paddingTop="16dp">
+
+            <!-- Ayırıcı Çizgi -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E0E0E0"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Açıklama -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Açıklama:"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#34495E" />
+
+            <TextView
+                android:id="@+id/tvSikayetAciklama"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Açıklama metni"
+                android:textSize="14sp"
+                android:textColor="#2C3E50"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Admin/Manager için kullanıcı bilgileri -->
+            <LinearLayout
+                android:id="@+id/userInfoLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:background="#F8F9FA"
+                android:padding="12dp"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Kullanıcı Bilgileri"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="#34495E" />
+
+                <TextView
+                    android:id="@+id/tvKullaniciAdi"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Kullanıcı adı"
+                    android:textSize="14sp"
+                    android:textColor="#2C3E50"
+                    android:layout_marginTop="4dp" />
+
+                <TextView
+                    android:id="@+id/tvKonum"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Konum bilgisi"
+                    android:textSize="14sp"
+                    android:textColor="#2C3E50"
+                    android:layout_marginTop="2dp" />
+
+                <TextView
+                    android:id="@+id/tvKullaniciTipi"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Kullanıcı tipi"
+                    android:textSize="14sp"
+                    android:textColor="#2C3E50"
+                    android:layout_marginTop="2dp" />
+
+            </LinearLayout>
+
+            <!-- Cevap Alanı -->
+            <LinearLayout
+                android:id="@+id/cevapLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:background="#E8F5E8"
+                android:padding="12dp"
+                android:layout_marginTop="4dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Yönetici Cevabı"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="#27AE60" />
+
+                <TextView
+                    android:id="@+id/tvSikayetCevap"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Cevap metni"
+                    android:textSize="14sp"
+                    android:textColor="#2C3E50"
+                    android:layout_marginTop="4dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

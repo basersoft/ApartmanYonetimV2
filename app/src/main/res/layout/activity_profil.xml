@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- ANA İÇERİK -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- TOOLBAR - HAMBURGER İKONU BURADA -->
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:title="Profilim" />
+
+        <!-- SCROLLVIEW İÇERİĞİ -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#f0f4f8"
+            android:padding="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Profil Başlık Kartı -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@drawable/card_background"
+                    android:padding="24dp"
+                    android:layout_marginBottom="16dp"
+                    android:elevation="4dp">
+
+                    <!-- Profil Resmi -->
+                    <ImageView
+                        android:id="@+id/ivProfilResmi"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_gravity="center"
+                        android:layout_marginBottom="16dp"
+                        android:contentDescription="Profil Resmi"
+                        android:scaleType="centerCrop" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="👤 Profilim"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:textColor="#2c3e50"
+                        android:gravity="center"
+                        android:layout_marginBottom="8dp" />
+
+                    <TextView
+                        android:id="@+id/tvAdSoyad"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Yükleniyor..."
+                        android:textSize="18sp"
+                        android:textColor="#34495e"
+                        android:gravity="center"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvEmail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Yükleniyor..."
+                        android:textSize="14sp"
+                        android:textColor="#7f8c8d"
+                        android:gravity="center"
+                        android:layout_marginTop="4dp" />
+
+                </LinearLayout>
+
+                <!-- İletişim Bilgileri Kartı -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@drawable/card_background"
+                    android:padding="20dp"
+                    android:layout_marginBottom="16dp"
+                    android:elevation="4dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="📞 İletişim Bilgileri"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="#2c3e50"
+                        android:layout_marginBottom="16dp" />
+
+                    <!-- Telefon -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingVertical="8dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Telefon:"
+                            android:textColor="#555555" />
+
+                        <TextView
+                            android:id="@+id/tvTelefon"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Yükleniyor..."
+                            android:textColor="#333333"
+                            android:gravity="end"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- Daire Bilgileri Kartı -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@drawable/card_background"
+                    android:padding="20dp"
+                    android:layout_marginBottom="16dp"
+                    android:elevation="4dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="🏠 Daire Bilgileri"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="#2c3e50"
+                        android:layout_marginBottom="16dp" />
+
+                    <!-- Blok -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingVertical="8dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Blok:"
+                            android:textColor="#555555" />
+
+                        <TextView
+                            android:id="@+id/tvBlok"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Yükleniyor..."
+                            android:textColor="#333333"
+                            android:gravity="end"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- Daire No -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingVertical="8dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Daire No:"
+                            android:textColor="#555555" />
+
+                        <TextView
+                            android:id="@+id/tvDaireNo"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Yükleniyor..."
+                            android:textColor="#333333"
+                            android:gravity="end"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- Sistem Bilgileri Kartı -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@drawable/card_background"
+                    android:padding="20dp"
+                    android:elevation="4dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="⚙️ Sistem Bilgileri"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="#2c3e50"
+                        android:layout_marginBottom="16dp" />
+
+                    <!-- Kullanıcı Tipi -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingVertical="6dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Kullanıcı Tipi:"
+                            android:textColor="#555555" />
+
+                        <TextView
+                            android:id="@+id/tvKullaniciTipi"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Yükleniyor..."
+                            android:textColor="#333333"
+                            android:gravity="end"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- Sakin Tipi -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingVertical="6dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Sakin Tipi:"
+                            android:textColor="#555555" />
+
+                        <TextView
+                            android:id="@+id/tvSakinTipi"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Yükleniyor..."
+                            android:textColor="#333333"
+                            android:gravity="end"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- Aidat Sorumlusu -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingVertical="6dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Aidat Sorumlusu:"
+                            android:textColor="#555555" />
+
+                        <TextView
+                            android:id="@+id/tvAidatSorumlu"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Yükleniyor..."
+                            android:textColor="#333333"
+                            android:gravity="end"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- İkamet Durumu -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingVertical="6dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="İkamet Ediyor:"
+                            android:textColor="#555555" />
+
+                        <TextView
+                            android:id="@+id/tvIkametDurumu"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Yükleniyor..."
+                            android:textColor="#333333"
+                            android:gravity="end"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- Hatırlatıcı -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingVertical="6dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Hatırlatıcılar:"
+                            android:textColor="#555555" />
+
+                        <TextView
+                            android:id="@+id/tvHatirlatici"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Yükleniyor..."
+                            android:textColor="#333333"
+                            android:gravity="end"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- Kayıt Tarihi -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingVertical="6dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Kayıt Tarihi:"
+                            android:textColor="#555555" />
+
+                        <TextView
+                            android:id="@+id/tvKayitTarihi"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Yükleniyor..."
+                            android:textColor="#333333"
+                            android:gravity="end" />
+                    </LinearLayout>
+
+                    <!-- Formatlı Tarih -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingVertical="6dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Formatlı Tarih:"
+                            android:textColor="#555555" />
+
+                        <TextView
+                            android:id="@+id/tvTarihFormatli"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Yükleniyor..."
+                            android:textColor="#333333"
+                            android:gravity="end" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </ScrollView>
+    </LinearLayout>
+
+    <!-- NAVIGATION DRAWER -->
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/navigation_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        app:menu="@menu/navigation_drawer_menu"
+        app:headerLayout="@layout/nav_header" />
+
+</androidx.drawerlayout.widget.DrawerLayout>

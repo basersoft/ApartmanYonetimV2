@@ -1,0 +1,438 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- ANA İÇERİK -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- TOOLBAR - HAMBURGER İKONU BURADA -->
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:title="Ayarlar" />
+
+        <!-- SCROLLVIEW İÇERİĞİ -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#f5f7fa"
+            android:padding="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Blynk Ayarları Kartı -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Blynk Ayarları"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:textColor="#4361ee"
+                            android:layout_marginBottom="12dp" />
+
+                        <!-- Blynk Token -->
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Blynk Token"
+                            android:textSize="14sp"
+                            android:textColor="#666666"
+                            android:layout_marginBottom="4dp" />
+
+                        <EditText
+                            android:id="@+id/etBlynkToken"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Blynk tokenınızı girin"
+                            android:inputType="text"
+                            android:background="@drawable/edittext_background"
+                            android:padding="12dp" />
+
+                        <!-- Blynk Pin -->
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Blynk Pin (V1, V2, vb.)"
+                            android:textSize="14sp"
+                            android:textColor="#666666"
+                            android:layout_marginTop="12dp"
+                            android:layout_marginBottom="4dp" />
+
+                        <EditText
+                            android:id="@+id/etBlynkPin"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="V1"
+                            android:inputType="text"
+                            android:background="@drawable/edittext_background"
+                            android:padding="12dp" />
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+                <!-- Garaj Konum Ayarları Kartı -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Garaj Konumu"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:textColor="#4361ee"
+                            android:layout_marginBottom="12dp" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <!-- Enlem -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:layout_marginEnd="8dp">
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text="Enlem"
+                                    android:textSize="14sp"
+                                    android:textColor="#666666"
+                                    android:layout_marginBottom="4dp" />
+
+                                <EditText
+                                    android:id="@+id/etGarajLat"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:hint="36.7917535"
+                                    android:inputType="numberDecimal"
+                                    android:background="@drawable/edittext_background"
+                                    android:padding="12dp" />
+
+                            </LinearLayout>
+
+                            <!-- Boylam -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:layout_marginStart="8dp">
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text="Boylam"
+                                    android:textSize="14sp"
+                                    android:textColor="#666666"
+                                    android:layout_marginBottom="4dp" />
+
+                                <EditText
+                                    android:id="@+id/etGarajLon"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:hint="34.5916286"
+                                    android:inputType="numberDecimal"
+                                    android:background="@drawable/edittext_background"
+                                    android:padding="12dp" />
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                        <!-- Çap -->
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Otomatik Açılma Çapı (metre)"
+                            android:textSize="14sp"
+                            android:textColor="#666666"
+                            android:layout_marginTop="12dp"
+                            android:layout_marginBottom="4dp" />
+
+                        <EditText
+                            android:id="@+id/etGeofenceRadius"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="50.0"
+                            android:inputType="numberDecimal"
+                            android:background="@drawable/edittext_background"
+                            android:padding="12dp" />
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+                <!-- Otomatik Garaj Açma Ayarları Kartı -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Otomatik Garaj Açma"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:textColor="#4361ee"
+                            android:layout_marginBottom="12dp" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Otomatik garaj açma özelliği"
+                                android:textSize="14sp"
+                                android:textColor="#666666" />
+
+                            <Switch
+                                android:id="@+id/switchAutoGarage"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:checked="true"
+                                android:textOn="AÇIK"
+                                android:textOff="KAPALI" />
+
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Bu özellik kapalıyken garaj sadece manuel butonla açılır"
+                            android:textSize="12sp"
+                            android:textColor="#FF9800"
+                            android:layout_marginTop="8dp"
+                            android:textStyle="italic" />
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+                <!-- Konum Güncelleme Hızı Kartı -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Konum Güncelleme Hızı"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:textColor="#4361ee"
+                            android:layout_marginBottom="12dp" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Konum güncelleme sıklığını seçin:"
+                            android:textSize="14sp"
+                            android:textColor="#666666"
+                            android:layout_marginBottom="8dp" />
+
+                        <Spinner
+                            android:id="@+id/spinnerLocationSpeed"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/edittext_background"
+                            android:padding="12dp" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Not: Daha hızlı güncelleme daha fazla pil tüketir"
+                            android:textSize="12sp"
+                            android:textColor="#FF9800"
+                            android:layout_marginTop="8dp"
+                            android:textStyle="italic" />
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+                <!-- API Ayarları Kartı -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="API Ayarları"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:textColor="#4361ee"
+                            android:layout_marginBottom="12dp" />
+
+                        <!-- API Key -->
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="API Key"
+                            android:textSize="14sp"
+                            android:textColor="#666666"
+                            android:layout_marginBottom="4dp" />
+
+                        <EditText
+                            android:id="@+id/etApiKey"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="API anahtarınız"
+                            android:inputType="text"
+                            android:background="@drawable/edittext_background"
+                            android:padding="12dp" />
+
+                        <!-- API URL -->
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="API URL"
+                            android:textSize="14sp"
+                            android:textColor="#666666"
+                            android:layout_marginTop="12dp"
+                            android:layout_marginBottom="4dp" />
+
+                        <EditText
+                            android:id="@+id/etApiUrl"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="API endpoint URL"
+                            android:inputType="textUri"
+                            android:background="@drawable/edittext_background"
+                            android:padding="12dp" />
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+                <!-- Butonlar -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="3">
+
+                    <Button
+                        android:id="@+id/btnSave"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        android:text="Kaydet"
+                        android:textColor="@color/white"
+                        android:backgroundTint="#4CAF50"
+                        android:textSize="14sp" />
+
+                    <Button
+                        android:id="@+id/btnReset"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:text="Sıfırla"
+                        android:textColor="@color/white"
+                        android:backgroundTint="#FF9800"
+                        android:textSize="14sp" />
+
+                    <Button
+                        android:id="@+id/btnBack"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        android:text="Geri"
+                        android:textColor="@color/white"
+                        android:backgroundTint="#F44336"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </ScrollView>
+    </LinearLayout>
+
+    <!-- NAVIGATION DRAWER -->
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/navigation_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        app:menu="@menu/navigation_drawer_menu"
+        app:headerLayout="@layout/nav_header" />
+
+</androidx.drawerlayout.widget.DrawerLayout>
