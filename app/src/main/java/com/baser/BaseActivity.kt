@@ -189,6 +189,13 @@ open class BaseActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
                 })
                 return true
             }
+            R.id.nav_api_settings -> {
+                val intent = Intent(this, ApiSettingsActivity::class.java)
+                intent.putExtra("user_email", userEmail)
+                intent.putExtra("user_type", userType)
+                intent.putExtra("user_name", userName)
+                startActivity(intent)
+            }
             R.id.nav_bakim -> {
                 Toast.makeText(this, "Bakım talepleri yakında eklenecek", Toast.LENGTH_SHORT).show()
                 return true

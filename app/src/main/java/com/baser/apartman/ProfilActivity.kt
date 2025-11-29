@@ -43,6 +43,8 @@ class ProfilActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profil)
+        // ApiManager'ı başlat
+        ApiManager.initialize(this)
 
         setupNavigation()
         setupViews()
@@ -126,46 +128,20 @@ class ProfilActivity : BaseActivity() {
 
     // ... diğer metodlar (loadUserProfile, parseUserProfile, vb.) aynı kalacak
     private fun loadUserProfile() {
-        println("🔍 Profil yükleniyor - Email: $userEmail")
-
-        val apiUrl = "http://baser.org/apartman/api/api_hepsi.php"
-        val SQLKEY = "randomkey"
-
         val sqlQuery = "SELECT * FROM apartman_users WHERE email = '$userEmail'"
-        println("🔍 SQL Sorgusu: $sqlQuery")
 
-        val params = HashMap<String, String>()
-        params["query"] = sqlQuery
-        params["key"] = SQLKEY
-
-        val stringRequest = object : StringRequest(
-            Request.Method.POST,
-            apiUrl,
-            { response ->
-                println("🔍 API Yanıtı: $response")
+        ApiManager.executeSQLQuery(
+            context = this,
+            query = sqlQuery,
+            onSuccess = { response ->
                 parseUserProfile(response)
             },
-            { error ->
-                val errorMsg = error.message ?: "Bilinmeyen hata"
-                println("❌ Profil yükleme hatası: $errorMsg")
-                Toast.makeText(this, "Profil bilgileri yüklenemedi", Toast.LENGTH_SHORT).show()
+            onError = { error ->
+                Toast.makeText(this, "Profil yüklenemedi: $error", Toast.LENGTH_SHORT).show()
                 showDefaultProfile()
             }
-        ) {
-            override fun getParams(): Map<String, String> {
-                return params
-            }
-
-            override fun getHeaders(): Map<String, String> {
-                val headers = HashMap<String, String>()
-                headers["Content-Type"] = "application/x-www-form-urlencoded"
-                return headers
-            }
-        }
-
-        Volley.newRequestQueue(this).add(stringRequest)
+        )
     }
-
     private fun parseUserProfile(csvResponse: String) {
         try {
             println("🔍 CSV Yanıtı işleniyor...")

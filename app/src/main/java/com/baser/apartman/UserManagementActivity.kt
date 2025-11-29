@@ -8,9 +8,6 @@ import android.widget.*
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
-import com.android.volley.Request
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
 import com.google.android.material.navigation.NavigationView
 import java.util.*
 import kotlin.collections.ArrayList
@@ -37,6 +34,9 @@ class UserManagementActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user_management)
+
+        // ApiManager'ı başlat
+        ApiManager.initialize(this)
 
         userEmail = intent.getStringExtra("user_email") ?: ""
         userType = intent.getStringExtra("user_type") ?: "resident"
@@ -416,10 +416,19 @@ class UserManagementActivity : AppCompatActivity() {
             "SELECT id, name, email, phone, apartment_block, apartment_number, user_type, resident_type, is_responsible_for_dues, is_residing FROM apartman_users WHERE email = '$userEmail'"
         }
 
-        executeSQLQuery(sqlQuery) { result ->
-            loadingIndicator.visibility = View.GONE
-            parseUserData(result)
-        }
+        ApiManager.executeSQLQuery(
+            context = this,
+            query = sqlQuery,
+            onSuccess = { result ->
+                loadingIndicator.visibility = View.GONE
+                parseUserData(result)
+            },
+            onError = { error ->
+                loadingIndicator.visibility = View.GONE
+                Toast.makeText(this, error, Toast.LENGTH_SHORT).show()
+                showEmptyState()
+            }
+        )
     }
 
     private fun parseUserData(csvData: String) {
@@ -516,67 +525,61 @@ class UserManagementActivity : AppCompatActivity() {
         val password = "123456"
         val sqlQuery = "INSERT INTO apartman_users (name, email, password, phone, apartment_block, apartment_number, user_type, resident_type, is_responsible_for_dues, is_residing, receive_reminders) VALUES ('$name', '$email', '$password', '$phone', '$block', '$number', '$userType', '$residentType', '$duesResponsibility', 'yes', 'yes')"
 
-        executeSQLQuery(sqlQuery) { result ->
-            if (result.contains("AFFECTED ROWS: 1")) {
-                Toast.makeText(this, "Kullanıcı başarıyla eklendi", Toast.LENGTH_SHORT).show()
-                loadUsersFromAPI()
-            } else {
-                Toast.makeText(this, "Kullanıcı eklenemedi", Toast.LENGTH_SHORT).show()
+        ApiManager.executeSQLQuery(
+            context = this,
+            query = sqlQuery,
+            onSuccess = { result ->
+                if (result.contains("AFFECTED ROWS: 1")) {
+                    Toast.makeText(this, "Kullanıcı başarıyla eklendi", Toast.LENGTH_SHORT).show()
+                    loadUsersFromAPI()
+                } else {
+                    Toast.makeText(this, "Kullanıcı eklenemedi", Toast.LENGTH_SHORT).show()
+                }
+            },
+            onError = { error ->
+                Toast.makeText(this, error, Toast.LENGTH_SHORT).show()
             }
-        }
+        )
     }
 
     private fun updateUserInAPI(userId: String, name: String, email: String, phone: String, block: String, number: String, userType: String, residentType: String, duesResponsibility: String) {
         val sqlQuery = "UPDATE apartman_users SET name='$name', email='$email', phone='$phone', apartment_block='$block', apartment_number='$number', user_type='$userType', resident_type='$residentType', is_responsible_for_dues='$duesResponsibility' WHERE id='$userId'"
 
-        executeSQLQuery(sqlQuery) { result ->
-            if (result.contains("AFFECTED ROWS: 1")) {
-                Toast.makeText(this, "Kullanıcı başarıyla güncellendi", Toast.LENGTH_SHORT).show()
-                loadUsersFromAPI()
-            } else {
-                Toast.makeText(this, "Kullanıcı güncellenemedi", Toast.LENGTH_SHORT).show()
+        ApiManager.executeSQLQuery(
+            context = this,
+            query = sqlQuery,
+            onSuccess = { result ->
+                if (result.contains("AFFECTED ROWS: 1")) {
+                    Toast.makeText(this, "Kullanıcı başarıyla güncellendi", Toast.LENGTH_SHORT).show()
+                    loadUsersFromAPI()
+                } else {
+                    Toast.makeText(this, "Kullanıcı güncellenemedi", Toast.LENGTH_SHORT).show()
+                }
+            },
+            onError = { error ->
+                Toast.makeText(this, error, Toast.LENGTH_SHORT).show()
             }
-        }
+        )
     }
 
     private fun deleteUserFromAPI(userId: String) {
         val sqlQuery = "DELETE FROM apartman_users WHERE id = '$userId'"
 
-        executeSQLQuery(sqlQuery) { result ->
-            if (result.contains("AFFECTED ROWS: 1")) {
-                Toast.makeText(this, "Kullanıcı başarıyla silindi", Toast.LENGTH_SHORT).show()
-                loadUsersFromAPI()
-            } else {
-                Toast.makeText(this, "Kullanıcı silinemedi", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    private fun executeSQLQuery(query: String, callback: (String) -> Unit) {
-        val apiUrl = "http://baser.org/apartman/api/api_hepsi.php"
-        val SQLKEY = "randomkey"
-
-        val stringRequest = object : StringRequest(
-            Request.Method.POST,
-            apiUrl,
-            { response ->
-                callback(response)
+        ApiManager.executeSQLQuery(
+            context = this,
+            query = sqlQuery,
+            onSuccess = { result ->
+                if (result.contains("AFFECTED ROWS: 1")) {
+                    Toast.makeText(this, "Kullanıcı başarıyla silindi", Toast.LENGTH_SHORT).show()
+                    loadUsersFromAPI()
+                } else {
+                    Toast.makeText(this, "Kullanıcı silinemedi", Toast.LENGTH_SHORT).show()
+                }
             },
-            { error ->
-                loadingIndicator.visibility = View.GONE
-                Toast.makeText(this, "Sunucu hatası: ${error.message}", Toast.LENGTH_SHORT).show()
-                showEmptyState()
+            onError = { error ->
+                Toast.makeText(this, error, Toast.LENGTH_SHORT).show()
             }
-        ) {
-            override fun getParams(): Map<String, String> {
-                val params = HashMap<String, String>()
-                params["query"] = query
-                params["key"] = SQLKEY
-                return params
-            }
-        }
-
-        Volley.newRequestQueue(this).add(stringRequest)
+        )
     }
 
     private fun showEmptyState() {

@@ -108,13 +108,17 @@
             android:name=".GeofenceForegroundService"
             android:enabled="true"
             android:exported="false" />
-
+        <activity android:name=".ApiSettingsActivity" />
         <!-- Garaj Servisi -->
         <service
             android:name=".GarajService"
             android:enabled="true"
             android:exported="false" />
 
+
+            android:id="@+id/nav_api_settings"
+            android:icon="@android:drawable/ic_menu_preferences"
+            android:title="API Ayarları" />
     </application>
 
 </manifest>
