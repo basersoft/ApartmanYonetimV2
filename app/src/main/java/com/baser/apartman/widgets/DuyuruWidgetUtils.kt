@@ -2,11 +2,11 @@ package com.baser.apartman.widgets
 
 import android.content.Context
 
-object AidatWidgetUtils {
+object DuyuruWidgetUtils {
 
     fun updateWidgets(context: Context) {
         try {
-            val appWidget = AidatAppWidget()
+            val appWidget = DuyuruAppWidget()
             appWidget.updateAllWidgets(context)
         } catch (e: Exception) {
             e.printStackTrace()
@@ -14,8 +14,8 @@ object AidatWidgetUtils {
         }
     }
 
-    // Bu metodu ekleyin - AidatActivity'de çağrılıyor
-    fun onNewAidatAdded(context: Context) {
+    // Yeni duyuru eklendiğinde çağrılacak metod
+    fun onNewDuyuruAdded(context: Context) {
         try {
             updateWidgets(context)
         } catch (e: Exception) {

@@ -8,12 +8,17 @@
         android:id="@+id/nav_profil"
         android:icon="@android:drawable/ic_menu_my_calendar"
         android:title="Profilim" />
-    <!-- YENİ: Kullanıcı Yönetimi -->
+
+    <!-- YENİ: Hava Durumu -->
+    <item
+        android:id="@+id/nav_weather"
+        android:icon="@android:drawable/ic_menu_day"
+        android:title="Hava Durumu" />
+
     <item
         android:id="@+id/nav_user_management"
         android:icon="@android:drawable/ic_menu_manage"
         android:title="Kullanıcı Yönetimi" />
-
     <item
         android:id="@+id/nav_duyurular"
         android:icon="@android:drawable/ic_menu_agenda"
@@ -22,36 +27,23 @@
         android:id="@+id/nav_aidat"
         android:icon="@android:drawable/ic_menu_manage"
         android:title="Aidat Takibi" />
-
-    <!-- YENİ: Toplu Harcamalar -->
     <item
         android:id="@+id/nav_shared_expenses"
         android:icon="@android:drawable/ic_menu_save"
         android:title="Toplu Harcamalar" />
-
-    <!-- YENİ: Gruplanmış Borçlar -->
     <item
         android:id="@+id/nav_gruplanmis_borclar"
         android:icon="@android:drawable/ic_menu_sort_by_size"
         android:title="Gruplanmış Borçlar" />
-
     <item
         android:id="@+id/nav_sikayetler"
         android:icon="@android:drawable/ic_menu_info_details"
         android:title="Şikayetler" />
-
-    <!-- YENİ: Yeni Şikayet -->
     <item
         android:id="@+id/nav_yeni_sikayet"
         android:icon="@android:drawable/ic_menu_add"
         android:title="Yeni Şikayet" />
 
-    <item
-        android:id="@+id/nav_bakim"
-        android:icon="@android:drawable/ic_menu_edit"
-        android:title="Bakım Talepleri" />
-
-    <!-- Ayarlar -->
     <item
         android:id="@+id/nav_settings"
         android:icon="@android:drawable/ic_menu_preferences"
@@ -64,4 +56,11 @@
         android:id="@+id/nav_logout"
         android:icon="@android:drawable/ic_lock_power_off"
         android:title="Çıkış Yap" />
+
+    <!-- COPYRIGHT BİLGİSİ -->
+    <item
+        android:id="@+id/nav_copyright"
+        android:title="© 2025 BaserSoft Apartman Yönetimi"
+        android:enabled="false"
+        android:clickable="false" />
 </menu>

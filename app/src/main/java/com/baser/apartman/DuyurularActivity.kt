@@ -7,7 +7,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import org.json.JSONArray
 import org.json.JSONObject
-
+import com.baser.apartman.widgets.DuyuruWidgetUtils // widgets paketinden import
+import com.baser.apartman.workers.WidgetUpdateWorker
 class DuyurularActivity : BaseActivity() {
 
     private lateinit var adapter: DuyuruAdapter
@@ -72,19 +73,41 @@ class DuyurularActivity : BaseActivity() {
 
                 println("🔍 TOPLAM DUYURU: ${duyuruArray.length()}")
 
+                // WIDGET İÇİN DEĞİŞKENLER
+                var sonDuyuruBaslik = ""
+                var sonDuyuruIcerik = ""
+                var sonDuyuruTarih = ""
+                var toplamDuyuruSayisi = duyuruArray.length()
+                var yeniDuyuruVar = false
+
                 for (i in 0 until duyuruArray.length()) {
                     val item = duyuruArray.getJSONObject(i)
+
+                    // SON DUYURUYU AL
+                    if (i == 0) { // En yeni duyuru ilk sırada
+                        sonDuyuruBaslik = item.getString("baslik")
+                        sonDuyuruIcerik = item.getString("icerik")
+                        sonDuyuruTarih = item.getString("tarih")
+                    }
+
                     val duyuru = Duyuru(
                         baslik = item.getString("baslik"),
                         icerik = item.getString("icerik"),
                         tarih = item.getString("tarih")
-                        // Diğer alanlar API response'una göre eklenebilir
                     )
                     duyuruList.add(duyuru)
                     println("🔍 DUYURU EKLENDİ: ${duyuru.baslik}")
                 }
 
                 adapter.setDuyuruList(duyuruList)
+
+                // WIDGET'I GÜNCELLE
+                updateWidgetWithDuyuruData(
+                    sonBaslik = sonDuyuruBaslik,
+                    sonIcerik = sonDuyuruIcerik,
+                    sonTarih = sonDuyuruTarih,
+                    toplamDuyuruSayisi = toplamDuyuruSayisi
+                )
 
                 if (duyuruList.isEmpty()) {
                     val message = jsonObject.optString("message", "Henüz hiç duyuru bulunmamaktadır")
@@ -107,6 +130,52 @@ class DuyurularActivity : BaseActivity() {
         }
     }
 
+    // WIDGET GÜNCELLEME FONKSİYONU
+    private fun updateWidgetWithDuyuruData(
+        sonBaslik: String,
+        sonIcerik: String,
+        sonTarih: String,
+        toplamDuyuruSayisi: Int
+    ) {
+        try {
+            val sharedPreferences = getSharedPreferences("duyuru_widget_prefs", android.content.Context.MODE_PRIVATE)
+            val editor = sharedPreferences.edit()
+
+            // Kullanıcı bilgilerini kaydet
+            editor.putString("user_email", userEmail ?: "")
+            editor.putString("user_type", userType ?: "user")
+            editor.putString("user_name", userName ?: "")
+
+            // Duyuru bilgilerini kaydet
+            editor.putString("son_duyuru_baslik", sonBaslik)
+            editor.putString("son_duyuru_icerik", sonIcerik)
+            editor.putString("son_duyuru_tarih", sonTarih)
+            editor.putInt("toplam_duyuru_sayisi", toplamDuyuruSayisi)
+
+            // Widget mesajını oluştur
+            val widgetMesaj = when {
+                toplamDuyuruSayisi > 0 -> {
+                    val kisaBaslik = if (sonBaslik.length > 20) sonBaslik.substring(0, 20) + "..." else sonBaslik
+                    "$toplamDuyuruSayisi Duyuru\n$kisaBaslik"
+                }
+                else -> "Duyuru Yok"
+            }
+            editor.putString("widget_mesaj", widgetMesaj)
+
+            editor.apply()
+
+            // Widget'ı güncelle - widgets paketinden
+            DuyuruWidgetUtils.updateWidgets(this)
+
+            println("🔍 DUYURU WIDGET GÜNCELLENDİ: $widgetMesaj")
+            println("🔍 KAYITLI EMAIL: ${sharedPreferences.getString("user_email", "BULUNAMADI")}")
+
+        } catch (e: Exception) {
+            println("🔍 DUYURU WIDGET GÜNCELLEME HATASI: ${e.message}")
+            e.printStackTrace()
+        }
+    }
+
     private fun showSampleData() {
         println("🔍 ÖRNEK DUYURULAR GÖSTERİLİYOR")
 
@@ -118,6 +187,15 @@ class DuyurularActivity : BaseActivity() {
         )
 
         adapter.setDuyuruList(ornekDuyurular)
+
+        // Örnek veriler için de widget'ı güncelle
+        updateWidgetWithDuyuruData(
+            sonBaslik = "Yeni Aidat Sistemi",
+            sonIcerik = "Aidatlar artık online ödenebilir.",
+            sonTarih = "15 Ocak 2024",
+            toplamDuyuruSayisi = 3
+        )
+
         Toast.makeText(this, "Örnek veriler gösteriliyor", Toast.LENGTH_SHORT).show()
     }
 }

@@ -4,10 +4,13 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.IBinder
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.android.volley.DefaultRetryPolicy
@@ -41,11 +44,13 @@ class GarajService : Service() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         startLocationTracking()
         createNotificationChannel()
+        Log.d("GarajService", "✅ Servis oluşturuldu - Kilitli ekranda çalışacak")
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val notification = createNotification()
         startForeground(NOTIFICATION_ID, notification)
+        Log.d("GarajService", "🔛 Servis başlatıldı - Foreground modunda")
         return START_STICKY
     }
 
@@ -58,7 +63,8 @@ class GarajService : Service() {
                 "Garaj Servisi",
                 NotificationManager.IMPORTANCE_LOW
             ).apply {
-                description = "Garaj otomatik açma servisi"
+                description = "Garaj otomatik açma servisi - Ekran kilitliyken çalışır"
+                setShowBadge(false)
             }
 
             val manager = getSystemService(NotificationManager::class.java)
@@ -68,23 +74,28 @@ class GarajService : Service() {
 
     private fun createNotification(): Notification {
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Garaj Servisi Aktif")
-            .setContentText("Konum takibi devam ediyor")
+            .setContentTitle("🔓 Garaj Servisi Aktif")
+            .setContentText("Konum takibi devam ediyor - Kilitli ekranda çalışır")
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setOngoing(true)
+            .setOnlyAlertOnce(true)
             .build()
     }
 
     private fun startLocationTracking() {
         val locationRequest = LocationRequest.create().apply {
-            interval = 8000 // 8 saniyede bir
-            fastestInterval = 5000 // En hızlı 5 saniye
+            interval = 5000 // 5 saniyede bir
+            fastestInterval = 3000 // En hızlı 3 saniye
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+            maxWaitTime = 10000 // Maksimum bekleme süresi
+            smallestDisplacement = 5f // 5 metrede bir güncelle
         }
 
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
                 locationResult.lastLocation?.let { location ->
+                    Log.d("GarajService", "📍 Konum güncellendi: ${"%.6f".format(location.latitude)}, ${"%.6f".format(location.longitude)}")
                     checkGeofence(location)
                 }
             }
@@ -96,9 +107,11 @@ class GarajService : Service() {
                 locationCallback,
                 null
             )
-            Log.d("GarajService", "📍 Konum takibi başlatıldı")
+            Log.d("GarajService", "📍 Konum takibi başlatıldı - Kilitli ekranda çalışıyor")
         } catch (e: SecurityException) {
-            Log.e("GarajService", "Konum izni hatası: ${e.message}")
+            Log.e("GarajService", "❌ Konum izni hatası: ${e.message}")
+        } catch (e: Exception) {
+            Log.e("GarajService", "❌ Konum takip hatası: ${e.message}")
         }
     }
 
@@ -106,6 +119,7 @@ class GarajService : Service() {
         val GARAJ_LATITUDE = prefs.getString("garaj_lat", "36.7917535")?.toDoubleOrNull() ?: 36.7917535
         val GARAJ_LONGITUDE = prefs.getString("garaj_lon", "34.5916286")?.toDoubleOrNull() ?: 34.5916286
         val GEOFENCE_RADIUS = prefs.getString("geofence_radius", "50.0")?.toDoubleOrNull() ?: 50.0
+        val isAutoGarageEnabled = prefs.getBoolean("auto_garage_enabled", true)
 
         val garageLocation = android.location.Location("garage").apply {
             latitude = GARAJ_LATITUDE
@@ -114,18 +128,25 @@ class GarajService : Service() {
 
         val distance = currentLocation.distanceTo(garageLocation)
 
-        Log.d("GarajService", "📍 Mesafe: ${"%.1f".format(distance)} m (Eşik: $GEOFENCE_RADIUS m)")
+        Log.d("GarajService", "📍 Mesafe: ${"%.1f".format(distance)} m (Eşik: $GEOFENCE_RADIUS m), Otomatik: $isAutoGarageEnabled")
 
-        if (distance <= GEOFENCE_RADIUS && !isGarajOpened) {
+        if (distance <= GEOFENCE_RADIUS && !isGarajOpened && isAutoGarageEnabled) {
             Log.d("GarajService", "🎯 ÇEMBER İÇİ! Garaj açılıyor...")
             openGarageAutomatically()
         } else if (distance > GEOFENCE_RADIUS) {
-            isGarajOpened = false
+            // Çemberden çıkınca durumu sıfırla
+            if (isGarajOpened) {
+                isGarajOpened = false
+                Log.d("GarajService", "📍 Çember dışı, garaj durumu sıfırlandı")
+            }
         }
     }
 
     private fun openGarageAutomatically() {
         isGarajOpened = true
+
+        // Kilitli ekranda titreşim
+        playVibration()
 
         val blynkToken = prefs.getString("blynk_token", "SİZİN_BLYNK_TOKEN_BURAYA") ?: "SİZİN_BLYNK_TOKEN_BURAYA"
         val blynkPin = prefs.getString("blynk_pin", "V1") ?: "V1"
@@ -138,17 +159,24 @@ class GarajService : Service() {
             blynkUrl,
             { response ->
                 Log.d("GarajService", "✅ Otomatik garaj açma başarılı: $response")
+
+                // Bildirim göster
+                showNotification("✅ Garaj otomatik açıldı")
+
                 // Veritabanına kayıt ekle
-                kayitEkleVeritabanina("Otomatik Açıldı")
+                kayitEkleVeritabanina("Otomatik Açıldı (Servis)")
             },
             { error ->
                 Log.e("GarajService", "❌ Otomatik garaj açma hatası: ${error.message}")
                 isGarajOpened = false // Hata durumunda durumu sıfırla
+
+                // Hata bildirimi göster
+                showNotification("❌ Garaj açılamadı")
             }
         )
 
         stringRequest.retryPolicy = DefaultRetryPolicy(
-            10000,
+            15000, // 15 saniye timeout
             DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
             DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
         )
@@ -156,23 +184,58 @@ class GarajService : Service() {
         Volley.newRequestQueue(this).add(stringRequest)
     }
 
+    private fun playVibration() {
+        try {
+            val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+            if (vibrator.hasVibrator()) {
+                // Uzun titreşim - kullanıcıyı bilgilendirmek için
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    vibrator.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE))
+                } else {
+                    vibrator.vibrate(500)
+                }
+                Log.d("GarajService", "📳 Titreşim verildi")
+            }
+        } catch (e: Exception) {
+            Log.e("GarajService", "❌ Titreşim hatası: ${e.message}")
+        }
+    }
+
+    private fun showNotification(message: String) {
+        try {
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+            val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+                .setContentTitle("Garaj Bildirimi")
+                .setContentText(message)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true)
+                .build()
+
+            notificationManager.notify(System.currentTimeMillis().toInt(), notification)
+            Log.d("GarajService", "📢 Bildirim gönderildi: $message")
+        } catch (e: Exception) {
+            Log.e("GarajService", "❌ Bildirim hatası: ${e.message}")
+        }
+    }
+
     private fun kayitEkleVeritabanina(yer: String) {
-        val userEmail = prefs.getString("user_email", "") ?: ""
-        val userName = prefs.getString("user_name", "Kullanıcı") ?: "Kullanıcı"
-        val telefon = prefs.getString("user_phone", "Bilinmiyor") ?: "Bilinmiyor"
+        try {
+            val userEmail = prefs.getString("user_email", "") ?: ""
+            val telefon = prefs.getString("user_phone", "Bilinmiyor") ?: "Bilinmiyor"
+            val currentTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
 
-        val currentTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
-
-        // SQL sorgusu oluştur
-        val sqlQuery = "INSERT INTO butondurum (telefon, yer, email, tarih) VALUES ('$telefon', '$yer', '$userEmail', '$currentTime')"
-
-        // API'ye gönder
-        veritabaninaKaydet(sqlQuery)
+            val sqlQuery = "INSERT INTO butondurum (telefon, yer, email, tarih) VALUES ('$telefon', '$yer', '$userEmail', '$currentTime')"
+            veritabaninaKaydet(sqlQuery)
+        } catch (e: Exception) {
+            Log.e("GarajService", "❌ Kayıt oluşturma hatası: ${e.message}")
+        }
     }
 
     private fun veritabaninaKaydet(sqlQuery: String) {
-        val apiUrl = "http://baser.org/apartman/api/api_sql.php" // PHP dosyanızın URL'si
-        val SQLKEY = "randomkey" // PHP dosyanızdaki key ile aynı olmalı
+        val apiUrl = "http://baser.org/apartman/api/api_hepsi.php"
+        val SQLKEY = "randomkey"
 
         val params = HashMap<String, String>()
         params["query"] = sqlQuery
@@ -204,7 +267,11 @@ class GarajService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        fusedLocationClient.removeLocationUpdates(locationCallback)
-        Log.d("GarajService", "❌ Servis durduruldu")
+        try {
+            fusedLocationClient.removeLocationUpdates(locationCallback)
+            Log.d("GarajService", "❌ Servis durduruldu")
+        } catch (e: Exception) {
+            Log.e("GarajService", "❌ Servis durdurma hatası: ${e.message}")
+        }
     }
 }

@@ -21,6 +21,11 @@ open class BaseActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
         // Kullanıcı bilgilerini yükle
         loadUserInfo()
+        // Widget'dan gelen email bilgisini kontrol et
+        val widgetEmail = intent.getStringExtra("user_email")
+        if (!widgetEmail.isNullOrEmpty()) {
+            userEmail = widgetEmail
+        }
     }
 
     protected open fun setupNavigation() {
@@ -104,6 +109,14 @@ open class BaseActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
                     })
                 }
                 return true
+            }
+            R.id.nav_weather -> {
+                // Hava durumu sayfasına git
+                if (this !is WeatherActivity) {
+                    val intent = Intent(this, WeatherActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                }
             }
             // YENİ: Kullanıcı Yönetimi navigasyonu
             R.id.nav_user_management -> {

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent"
+    android:gravity="center"
+    android:padding="0dp">
+
+    <!-- Daha büyük buton ve ikon -->
+    <Button
+        android:id="@+id/widgetButton"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:text="🚗"
+        android:textSize="38sp"
+        android:textStyle="bold"
+        android:background="@android:color/transparent"
+        android:textColor="#FF5722"
+        android:gravity="center"
+        android:padding="0dp"
+        android:includeFontPadding="false" />
+
+</LinearLayout>

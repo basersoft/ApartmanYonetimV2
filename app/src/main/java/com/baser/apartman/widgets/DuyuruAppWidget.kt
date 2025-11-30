@@ -7,10 +7,10 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.widget.RemoteViews
-import com.baser.apartman.AidatActivity
+import com.baser.apartman.DuyurularActivity
 import com.baser.apartman.R
 
-class AidatAppWidget : AppWidgetProvider() {
+class DuyuruAppWidget : AppWidgetProvider() {
 
     override fun onUpdate(
         context: Context,
@@ -28,42 +28,37 @@ class AidatAppWidget : AppWidgetProvider() {
         appWidgetId: Int
     ) {
         try {
-            val views = RemoteViews(context.packageName, R.layout.widget_aidat)
-            val sharedPreferences = context.getSharedPreferences("widget_prefs", Context.MODE_PRIVATE)
+            val views = RemoteViews(context.packageName, R.layout.widget_duyuru)
+            val sharedPreferences = context.getSharedPreferences("duyuru_widget_prefs", Context.MODE_PRIVATE)
 
-            // SharedPreferences'tan detaylı verileri al
-            val durum = sharedPreferences.getString("aidat_durum", "Bekleniyor") ?: "Bekleniyor"
-            val sonAy = sharedPreferences.getString("son_ay", "") ?: ""
-            val gecikmisSayi = sharedPreferences.getInt("gecikmis_sayi", 0)
-            val toplamBorc = sharedPreferences.getFloat("toplam_borc", 0f)
+            // SharedPreferences'tan verileri al
+            val widgetMesaj = sharedPreferences.getString("widget_mesaj", "Duyuru Yok") ?: "Duyuru Yok"
+            val sonBaslik = sharedPreferences.getString("son_duyuru_baslik", "") ?: ""
+            val sonTarih = sharedPreferences.getString("son_duyuru_tarih", "") ?: ""
+            val toplamDuyuruSayisi = sharedPreferences.getInt("toplam_duyuru_sayisi", 0)
             val userEmail = sharedPreferences.getString("user_email", "") ?: ""
-            val toplamAidatSayisi = sharedPreferences.getInt("toplam_aidat_sayisi", 0)
-            val odenecekAidatSayisi = sharedPreferences.getInt("odenecek_aidat_sayisi", 0)
-            val enYakinSonTarih = sharedPreferences.getString("en_yakin_son_tarih", "") ?: ""
-            val widgetMesaj = sharedPreferences.getString("widget_mesaj", "Yükleniyor...") ?: "Yükleniyor..."
 
-            println("🔍 WIDGET - KAYITLI EMAIL: $userEmail")
-            println("🔍 WIDGET - DETAYLI VERİLER: Gecikmiş: $gecikmisSayi, Borç: $toplamBorc, Ödenecek: $odenecekAidatSayisi")
+            println("🔍 DUYURU WIDGET - KAYITLI EMAIL: $userEmail")
+            println("🔍 DUYURU WIDGET - MESAJ: $widgetMesaj")
 
             // Widget içeriğini güncelle
-            views.setTextViewText(R.id.widget_title, "Aidat Durum")
+            views.setTextViewText(R.id.widget_title, "Son Duyuru")
 
-            // Detaylı durum mesajı
+            // Duruma göre detaylı mesaj
             val statusText = widgetMesaj
 
             views.setTextViewText(R.id.widget_status, statusText)
 
-            // Duruma göre arkaplan rengi - DAHA AYRINTILI
+            // Duruma göre arkaplan rengi
             val bgColor = when {
-                gecikmisSayi > 0 -> Color.parseColor("#e74c3c") // Kırmızı - Gecikmiş
-                odenecekAidatSayisi > 0 -> Color.parseColor("#f39c12") // Turuncu - Bekleyen
-                else -> Color.parseColor("#2ecc71") // Yeşil - Güncel
+                toplamDuyuruSayisi > 0 -> Color.parseColor("#9b59b6") // Mor - Duyuru var
+                else -> Color.parseColor("#95a5a6") // Gri - Duyuru yok
             }
 
             views.setInt(R.id.widget_layout, "setBackgroundColor", bgColor)
 
-            // Tıklanma işlemi - EMAIL BİLGİSİNİ MUTLAKA EKLEYİN
-            val intent = Intent(context, AidatActivity::class.java).apply {
+            // Tıklanma işlemi - DuyurularActivity'ye yönlendir
+            val intent = Intent(context, DuyurularActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
                 putExtra("user_email", userEmail)
                 putExtra("user_type", sharedPreferences.getString("user_type", "user"))
@@ -87,7 +82,7 @@ class AidatAppWidget : AppWidgetProvider() {
     fun updateAllWidgets(context: Context) {
         try {
             val appWidgetManager = AppWidgetManager.getInstance(context)
-            val thisWidget = android.content.ComponentName(context, AidatAppWidget::class.java)
+            val thisWidget = android.content.ComponentName(context, DuyuruAppWidget::class.java)
             val appWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget)
 
             if (appWidgetIds.isNotEmpty()) {

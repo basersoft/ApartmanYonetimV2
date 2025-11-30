@@ -426,7 +426,11 @@
                                 android:textColor="@color/white"
                                 android:backgroundTint="#3498db"
                                 android:textSize="14sp" />
-
+                            <!-- BU SATIRLARI EKLE -->
+                            android:soundEffectsEnabled="true"
+                            android:focusable="true"
+                            android:clickable="true"
+                            android:longClickable="false" />
                         </LinearLayout>
 
                         <!-- 2. Satır Butonları -->

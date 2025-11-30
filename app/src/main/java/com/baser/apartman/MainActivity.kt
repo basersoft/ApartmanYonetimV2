@@ -18,9 +18,7 @@ import java.net.URL
 import java.net.URLEncoder
 import kotlin.concurrent.thread
 import android.widget.CheckBox
-
-
-
+import com.baser.apartman.workers.WidgetUpdateWorker
 
 class MainActivity : AppCompatActivity() {
 
@@ -29,7 +27,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
+        //WeatherWidgetUtils.updateWidgets(this)
+        val weatherWidget = findViewById<com.baser.apartman.weather.WeatherWidget>(R.id.weatherWidget)
         ivBackground = findViewById(R.id.ivBackground)
 
         // ÖNCE KAYDEDİLMİŞ KULLANICI VAR MI KONTROL ET
@@ -37,9 +36,29 @@ class MainActivity : AppCompatActivity() {
 
         // Webden resmi yükle
         loadBackgroundImage()
-
+        startWidgetAutoUpdate()
         setupClickListeners()
     }
+
+    // EKSİK FONKSİYONU EKLEYİN - BAŞLANGIÇ
+    private fun startWidgetAutoUpdate() {
+        try {
+            println("🔧 Widget otomatik güncelleme başlatılıyor...")
+
+            // ✅ 1. WorkManager'ı AKTİF ET (yorumu kaldır)
+            WidgetUpdateWorker.scheduleWidgetUpdate(this)
+
+            // ✅ 2. Anlık güncelleme de yap
+            com.baser.apartman.widgets.AidatWidgetUtils.updateWidgets(this)
+            com.baser.apartman.widgets.DuyuruWidgetUtils.updateWidgets(this)
+
+            println("✅ Widget otomatik güncelleme başlatıldı")
+
+        } catch (e: Exception) {
+            println("❌ Widget güncelleme hatası: ${e.message}")
+        }
+    }
+    // EKSİK FONKSİYONU EKLEYİN - BİTİŞ
 
     private fun checkSavedUser() {
         val sharedPref = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
@@ -66,6 +85,36 @@ class MainActivity : AppCompatActivity() {
                 findViewById<android.widget.EditText>(R.id.etEmail).setText(savedEmail)
             }
         }
+    }
+
+    private fun onLoginSuccess(email: String, type: String, name: String, rememberMe: Boolean) {
+        // MEVCUT KOD - user_prefs'e kaydet
+        val userPrefs = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+        userPrefs.edit().apply {
+            putString("user_email", email)
+            putString("user_type", type)
+            putString("user_name", name)
+            putBoolean("beni_hatirla", rememberMe)
+            apply()
+        }
+
+        // YENİ EKLENEN KOD - widget_prefs'e de aynı bilgileri kaydet
+        val widgetPrefs = getSharedPreferences("widget_prefs", Context.MODE_PRIVATE)
+        widgetPrefs.edit().apply {
+            putString("user_email", email)
+            putString("user_type", type)
+            putString("user_name", name)
+            apply()
+        }
+
+        println("🔍 LOGIN BAŞARILI - WIDGET İÇİN EMAIL KAYDEDİLDİ: $email")
+
+        val intent = Intent(this, DashboardActivity::class.java)
+        intent.putExtra("user_email", email)
+        intent.putExtra("user_type", type)
+        intent.putExtra("user_name", name)
+        startActivity(intent)
+        finish()
     }
 
     private fun loadBackgroundImage() {
@@ -218,14 +267,11 @@ class MainActivity : AppCompatActivity() {
 
                     Toast.makeText(this, "✓ $message", Toast.LENGTH_LONG).show()
 
+                    // Kullanıcı bilgilerini kaydet
                     saveUserInfo(email, userType, userName, rememberMe)
 
-                    val intent = Intent(this, DashboardActivity::class.java)
-                    intent.putExtra("user_email", email)
-                    intent.putExtra("user_type", userType)
-                    intent.putExtra("user_name", userName)
-                    startActivity(intent)
-                    finish()
+                    // DÜZELTME: userEmail yerine email parametresini kullan
+                    onLoginSuccess(email, userType, userName, rememberMe)
 
                 } else {
                     Toast.makeText(this, "✗ $message", Toast.LENGTH_LONG).show()

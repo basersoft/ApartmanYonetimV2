@@ -11,8 +11,10 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
+        android:name=".MyApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -96,6 +98,18 @@
             android:parentActivityName=".SharedExpensesActivity"
             android:exported="false" />
 
+        <!-- API Ayarları Activity -->
+        <activity
+            android:name=".ApiSettingsActivity"
+            android:label="API Ayarları"
+            android:parentActivityName=".DashboardActivity"
+            android:exported="false" />
+        <activity
+            android:name=".WeatherActivity"
+            android:label="Hava Durumu"
+            android:parentActivityName=".MainActivity"
+            android:exported="false" />
+
         <!-- Servisler -->
         <service android:name=".NotificationService" />
 
@@ -108,17 +122,65 @@
             android:name=".GeofenceForegroundService"
             android:enabled="true"
             android:exported="false" />
-        <activity android:name=".ApiSettingsActivity" />
+
         <!-- Garaj Servisi -->
         <service
             android:name=".GarajService"
             android:enabled="true"
             android:exported="false" />
 
+        <!-- WEATHER WIDGET -->
+        <receiver
+            android:name=".weather.WeatherAppWidget"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
 
-            android:id="@+id/nav_api_settings"
-            android:icon="@android:drawable/ic_menu_preferences"
-            android:title="API Ayarları" />
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/weather_widget_info" />
+        </receiver>
+
+        <!-- Aidat Widget -->
+        <receiver
+            android:name=".widgets.AidatAppWidget"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/aidat_widget_info" />
+        </receiver>
+
+        <!-- Duyuru Widget -->
+        <receiver
+            android:name=".widgets.DuyuruAppWidget"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/duyuru_widget_info" />
+        </receiver>
+        <receiver
+            android:name=".widgets.GarajWidget"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_garaj_info" />
+        </receiver>
+
+        <service
+            android:name=".widgets.GarajAcaService"
+            android:exported="false" />
     </application>
 
 </manifest>

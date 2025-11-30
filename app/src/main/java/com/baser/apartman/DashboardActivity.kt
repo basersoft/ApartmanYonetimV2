@@ -41,7 +41,9 @@ import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-
+import android.content.Context
+import android.os.VibrationEffect
+import android.os.Vibrator
 class DashboardActivity : BaseActivity() {
 
     private lateinit var tvWelcome: TextView
@@ -571,7 +573,7 @@ class DashboardActivity : BaseActivity() {
 
     private fun openGarageAutomatically() {
         println("🚗 Otomatik garaj açma tetiklendi - Mesafe: $GEOFENCE_RADIUS metre içinde")
-
+        playSoundAndVibration()
         // Garajın açıldığını işaretle
         isGarajOpened = true
 
@@ -640,13 +642,18 @@ class DashboardActivity : BaseActivity() {
 
     private fun setupGarajButton() {
         btnGarajAc.setOnClickListener {
+            // Telefonun default click efekti (ses + titreşim) otomatik çalışır
             startButtonAnimations()
             Handler(Looper.getMainLooper()).postDelayed({
                 garajAcAPIistegiGonder()
-            }, 300)
+                playSoundAndVibration()
+
+                startButtonAnimations()
+            }, 150) // Daha kısa delay
         }
     }
 
+    // playSoundAndVibration metodunu SİLİYORUZ, gerek yok
     private fun startButtonAnimations() {
         try {
             val shakeAnim = AnimationUtils.loadAnimation(this, R.anim.shake)
@@ -673,8 +680,28 @@ class DashboardActivity : BaseActivity() {
             println("❌ Animasyon hatası: ${e.message}")
         }
     }
+    private fun playSoundAndVibration() {
+        try {
+            // Titreşim efekti
+            val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+            if (vibrator.hasVibrator()) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    vibrator.vibrate(VibrationEffect.createOneShot(150, VibrationEffect.DEFAULT_AMPLITUDE))
+                } else {
+                    // Android 8 öncesi
+                    vibrator.vibrate(150)
+                }
+            }
 
+            // Click sesi - Android'in default buton sesi
+            btnGarajAc.playSoundEffect(android.view.SoundEffectConstants.CLICK)
+
+        } catch (e: Exception) {
+            println("❌ Titreşim/ses hatası: ${e.message}")
+        }
+    }
     private fun garajAcAPIistegiGonder() {
+        playSoundAndVibration()
         val blynkToken = getBlynkToken()
         val blynkPin = getBlynkPin()
         val blynkUrl = "https://sgp1.blynk.cloud/external/api/update?token=$blynkToken&$blynkPin=1"
