@@ -18,17 +18,16 @@ class AdminAidatAdapter(
     private var selectedPosition = -1
 
     class AdminAidatViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        // Layout'taki TÜM ID'ler burada
         val tvUserName: TextView = itemView.findViewById(R.id.tvUserName)
+        val tvStatus: TextView = itemView.findViewById(R.id.tvStatus)
         val tvUserEmail: TextView = itemView.findViewById(R.id.tvUserEmail)
         val tvApartment: TextView = itemView.findViewById(R.id.tvApartment)
         val tvAmount: TextView = itemView.findViewById(R.id.tvAmount)
         val tvDueDate: TextView = itemView.findViewById(R.id.tvDueDate)
-        val tvStatus: TextView = itemView.findViewById(R.id.tvStatus)
-        val tvPaymentDate: TextView = itemView.findViewById(R.id.tvPaymentDate)
         val tvLateFee: TextView = itemView.findViewById(R.id.tvLateFee)
+        val tvPaymentDate: TextView = itemView.findViewById(R.id.tvPaymentDate)
         val layoutDetails: View = itemView.findViewById(R.id.layoutDetails)
-        
-        // Detay alanları
         val tvDetailDescription: TextView = itemView.findViewById(R.id.tvDetailDescription)
         val tvDetailOriginalAmount: TextView = itemView.findViewById(R.id.tvDetailOriginalAmount)
         val tvDetailLateFee: TextView = itemView.findViewById(R.id.tvDetailLateFee)
@@ -47,18 +46,23 @@ class AdminAidatAdapter(
         val context = holder.itemView.context
         val isSelected = position == selectedPosition
 
+        // 1. Temel bilgiler
         holder.tvUserName.text = aidat.userName
         holder.tvUserEmail.text = aidat.kullanici_email
         holder.tvApartment.text = "${aidat.apartmentBlock} - ${aidat.apartmentNumber}"
 
-        // Tutarı formatla
+        // 2. Tutar formatı
         val numberFormat = NumberFormat.getCurrencyInstance(Locale("tr", "TR"))
         holder.tvAmount.text = numberFormat.format(aidat.amount)
 
+        // 3. Son tarih
         holder.tvDueDate.text = "Son Tarih: ${formatDate(aidat.son_tarih)}"
-        holder.tvStatus.text = getStatusText(aidat.durum)
 
-        // Gecikme zammı
+        // 4. Durum
+        holder.tvStatus.text = getStatusText(aidat.durum)
+        setStatusBackground(holder.tvStatus, aidat.durum, context)
+
+        // 5. Gecikme zammı
         if (aidat.lateFeeAmount > 0) {
             holder.tvLateFee.text = "Gecikme Zammı: ${numberFormat.format(aidat.lateFeeAmount)}"
             holder.tvLateFee.visibility = View.VISIBLE
@@ -66,7 +70,7 @@ class AdminAidatAdapter(
             holder.tvLateFee.visibility = View.GONE
         }
 
-        // Ödeme tarihi
+        // 6. Ödeme tarihi
         if (!aidat.odeme_tarihi.isNullOrEmpty()) {
             holder.tvPaymentDate.text = "Ödeme: ${formatDate(aidat.odeme_tarihi)}"
             holder.tvPaymentDate.visibility = View.VISIBLE
@@ -74,38 +78,41 @@ class AdminAidatAdapter(
             holder.tvPaymentDate.visibility = View.GONE
         }
 
-        // Duruma göre renk ayarla
-        setStatusBackground(holder.tvStatus, aidat.durum, context)
-
-        // Detayları doldur
-        holder.tvDetailDescription.text = aidat.description
-        holder.tvDetailOriginalAmount.text = numberFormat.format(aidat.amount)
-        holder.tvDetailLateFee.text = numberFormat.format(aidat.lateFeeAmount)
-        holder.tvDetailTotalAmount.text = numberFormat.format(aidat.amount + aidat.lateFeeAmount)
-        
-        // Gecikme gün sayısını hesapla
-        val daysLate = calculateDaysLate(aidat.son_tarih, aidat.durum)
-        holder.tvDetailDaysLate.text = if (daysLate > 0) "$daysLate gün" else "Gecikme yok"
-
-        // Seçili durumu ayarla
+        // 7. Detay bilgileri (sadece seçiliyse göster)
         if (isSelected) {
             holder.layoutDetails.visibility = View.VISIBLE
+
+            // Detay alanlarını doldur
+            holder.tvDetailDescription.text = aidat.description
+            holder.tvDetailOriginalAmount.text = numberFormat.format(aidat.amount)
+            holder.tvDetailLateFee.text = numberFormat.format(aidat.lateFeeAmount)
+
+            val totalAmount = aidat.amount + aidat.lateFeeAmount
+            holder.tvDetailTotalAmount.text = numberFormat.format(totalAmount)
+
+            // Gecikme gün sayısı
+            val daysLate = calculateDaysLate(aidat.son_tarih, aidat.durum)
+            holder.tvDetailDaysLate.text = if (daysLate > 0) "$daysLate gün" else "Gecikme yok"
+
+            // Seçili arka plan
             holder.itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.selected_item_background))
         } else {
             holder.layoutDetails.visibility = View.GONE
-            holder.itemView.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent))
+            holder.itemView.setBackgroundColor(ContextCompat.getColor(context, android.R.color.white))
         }
 
-        // Tıklama olayı
+        // 8. Tıklama olayı
         holder.itemView.setOnClickListener {
             val previousSelected = selectedPosition
             selectedPosition = if (selectedPosition == position) -1 else position
-            
-            notifyItemChanged(previousSelected)
+
+            if (previousSelected != -1) {
+                notifyItemChanged(previousSelected)
+            }
             if (selectedPosition != -1) {
                 notifyItemChanged(selectedPosition)
             }
-            
+
             onItemClick(aidat)
         }
     }
@@ -126,6 +133,14 @@ class AdminAidatAdapter(
         }
     }
 
+    fun getSelectedItem(): Aidat? {
+        return if (selectedPosition != -1 && selectedPosition < aidatList.size) {
+            aidatList[selectedPosition]
+        } else {
+            null
+        }
+    }
+
     private fun formatDate(dateString: String): String {
         return try {
             val parts = dateString.split("-")
@@ -141,18 +156,18 @@ class AdminAidatAdapter(
 
     private fun getStatusText(status: String): String {
         return when (status.lowercase()) {
-            "paid" -> "Ödendi"
-            "pending" -> "Bekliyor"
-            "overdue" -> "Gecikmiş"
-            else -> status
+            "paid" -> "ÖDENDİ"
+            "pending" -> "BEKLİYOR"
+            "overdue" -> "GECİKMİŞ"
+            else -> status.uppercase()
         }
     }
 
     private fun setStatusBackground(textView: TextView, status: String, context: android.content.Context) {
         val colorRes = when (status.lowercase()) {
-            "paid", "ödendi" -> R.color.status_paid
-            "pending", "bekliyor" -> R.color.status_pending
-            "overdue", "gecikmiş" -> R.color.status_overdue
+            "paid" -> R.color.status_paid
+            "pending" -> R.color.status_pending
+            "overdue" -> R.color.status_overdue
             else -> R.color.status_default
         }
         textView.setBackgroundColor(ContextCompat.getColor(context, colorRes))
@@ -160,12 +175,12 @@ class AdminAidatAdapter(
 
     private fun calculateDaysLate(dueDate: String, status: String): Int {
         if (status.lowercase() == "paid") return 0
-        
+
         return try {
             val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
             val dueDateObj = dateFormat.parse(dueDate)
             val today = Date()
-            
+
             if (dueDateObj != null && dueDateObj.before(today)) {
                 val diff = today.time - dueDateObj.time
                 (diff / (24 * 60 * 60 * 1000)).toInt()

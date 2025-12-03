@@ -41,4 +41,14 @@
     <!-- Selection Colors -->
     <color name="selected_item_background">#E3F2FD</color>
     <color name="detail_background">#f8f9fa</color>
+    <!-- Yeni renkler -->
+    <color name="status_partial">#FFA500</color> <!-- Turuncu -->
+
+    <color name="light_gray">#F5F5F5</color>
+
+    <color name="primary_color">#2196F3</color>
+
+    <color name="green">#4CAF50</color>
+    <color name="red">#F44336</color>
+
 </resources>

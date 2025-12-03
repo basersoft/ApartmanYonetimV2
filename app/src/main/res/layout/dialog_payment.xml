@@ -1,9 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="16dp">
+
+    <!-- Toplam Borç Bilgisi -->
+    <TextView
+        android:id="@+id/tvTotalDebt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Toplam Borç: ₺0.00"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="#e74c3c"
+        android:gravity="center"
+        android:padding="8dp"
+        android:background="#fde8e8"
+        android:layout_marginBottom="16dp" />
 
     <TextView
         android:layout_width="match_parent"
@@ -15,6 +30,7 @@
         android:layout_marginBottom="16dp" />
 
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilPaymentAmount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
@@ -58,5 +74,16 @@
             android:maxLines="3" />
 
     </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Minimum Ödeme Uyarısı -->
+    <TextView
+        android:id="@+id/tvMinPaymentWarning"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Minimum ödeme: ₺0.00"
+        android:textSize="12sp"
+        android:textColor="#f39c12"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone" />
 
 </LinearLayout>

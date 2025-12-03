@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "ApartmanYonetim"
 include(":app")
+include(":wear")

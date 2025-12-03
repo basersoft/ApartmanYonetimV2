@@ -12,9 +12,11 @@ import com.google.android.material.navigation.NavigationView
 
 open class BaseActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
-    protected lateinit var userEmail: String
-    protected lateinit var userType: String
-    protected lateinit var userName: String
+    // Değişkenleri nullable yap ve varsayılan değer ata
+    protected var userEmail: String = ""
+    protected var userType: String = ""
+    protected var userName: String = ""
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -252,7 +254,6 @@ open class BaseActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         val sharedPref = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
         return sharedPref.getString("user_name", "Kullanıcı") ?: "Kullanıcı"
     }
-
     // YENİ METOD: Kullanıcı ID'sini al - property yerine method kullanıyoruz
     protected fun getCurrentUserId(): String {
         val sharedPref = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)

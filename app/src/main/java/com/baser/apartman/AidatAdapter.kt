@@ -1,20 +1,23 @@
 package com.baser.apartman
 
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class AidatAdapter(private var aidatList: List<Aidat> = emptyList()) :
-    RecyclerView.Adapter<AidatAdapter.AidatViewHolder>() {
+class AidatAdapter(
+    private var aidatList: List<Aidat> = emptyList(),
+    private val onItemClick: (Aidat) -> Unit = {}
+) : RecyclerView.Adapter<AidatAdapter.AidatViewHolder>() {
 
     class AidatViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        // item_aidat.xml'deki ID'ler
+        val tvKullanici: TextView = itemView.findViewById(R.id.tvKullanici)
         val tvTarih: TextView = itemView.findViewById(R.id.tvTarih)
         val tvTutar: TextView = itemView.findViewById(R.id.tvTutar)
-        val tvDurum: TextView = itemView.findViewById(R.id.tvDurum)
         val tvSonTarih: TextView = itemView.findViewById(R.id.tvSonTarih)
+        val tvDurum: TextView = itemView.findViewById(R.id.tvDurum)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AidatViewHolder {
@@ -25,24 +28,29 @@ class AidatAdapter(private var aidatList: List<Aidat> = emptyList()) :
 
     override fun onBindViewHolder(holder: AidatViewHolder, position: Int) {
         val aidat = aidatList[position]
+        val context = holder.itemView.context
 
-        holder.tvTarih.text = aidat.ay
-        holder.tvTutar.text = aidat.miktar
-        holder.tvDurum.text = aidat.durum
+        // Kullanıcı bilgisi - sadece admin ise göster
+        holder.tvKullanici.text = "${aidat.userName} (${aidat.kullanici_email})"
+        // Normal kullanıcılar için gizle
+        holder.tvKullanici.visibility = View.GONE
 
-        // Durum rengini ayarla
-        try {
-            holder.tvDurum.setBackgroundColor(Color.parseColor(aidat.durumRenk))
-        } catch (e: Exception) {
-            // Varsayılan renk
-            holder.tvDurum.setBackgroundColor(Color.parseColor("#f39c12"))
-        }
+        // Tarih/Ay bilgisi
+        holder.tvTarih.text = aidat.description.ifEmpty { aidat.ay }
 
-        // Son tarihi göster
-        holder.tvSonTarih.text = if (!aidat.son_tarih.isNullOrEmpty()) {
-            "Son Tarih: ${aidat.son_tarih}"
-        } else {
-            "Son Tarih: Belirtilmemiş"
+        // Tutar
+        holder.tvTutar.text = formatAmount(aidat.amount)
+
+        // Son tarih
+        holder.tvSonTarih.text = "Son Tarih: ${formatDateForDisplay(aidat.son_tarih)}"
+
+        // Durum
+        holder.tvDurum.text = getStatusText(aidat.durum)
+        setStatusBackground(holder.tvDurum, aidat.durum, context)
+
+        // Tıklama
+        holder.itemView.setOnClickListener {
+            onItemClick(aidat)
         }
     }
 
@@ -51,5 +59,62 @@ class AidatAdapter(private var aidatList: List<Aidat> = emptyList()) :
     fun setAidatList(newList: List<Aidat>) {
         aidatList = newList
         notifyDataSetChanged()
+    }
+
+    private fun formatAmount(amount: Double): String {
+        return String.format("₺%.2f", amount)
+    }
+
+    private fun formatDateForDisplay(dateString: String): String {
+        return try {
+            val parts = dateString.split("-")
+            if (parts.size == 3) {
+                val day = parts[2]
+                val month = getMonthName(parts[1].toInt())
+                val year = parts[0]
+                "$day $month $year"
+            } else {
+                dateString
+            }
+        } catch (e: Exception) {
+            dateString
+        }
+    }
+
+    private fun getMonthName(month: Int): String {
+        return when (month) {
+            1 -> "Ocak"
+            2 -> "Şubat"
+            3 -> "Mart"
+            4 -> "Nisan"
+            5 -> "Mayıs"
+            6 -> "Haziran"
+            7 -> "Temmuz"
+            8 -> "Ağustos"
+            9 -> "Eylül"
+            10 -> "Ekim"
+            11 -> "Kasım"
+            12 -> "Aralık"
+            else -> ""
+        }
+    }
+
+    private fun getStatusText(status: String): String {
+        return when (status.lowercase()) {
+            "paid" -> "ÖDENDİ"
+            "pending" -> "BEKLİYOR"
+            "overdue" -> "GECİKMİŞ"
+            else -> status.uppercase()
+        }
+    }
+
+    private fun setStatusBackground(textView: TextView, status: String, context: android.content.Context) {
+        val colorRes = when (status.lowercase()) {
+            "paid" -> R.color.status_paid
+            "pending" -> R.color.status_pending
+            "overdue" -> R.color.status_overdue
+            else -> R.color.status_default
+        }
+        textView.setBackgroundColor(androidx.core.content.ContextCompat.getColor(context, colorRes))
     }
 }

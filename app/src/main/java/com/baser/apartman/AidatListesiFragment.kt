@@ -76,7 +76,7 @@ class AidatListesiFragment : Fragment() {
         adapter = AdminAidatAdapter(onItemClick = { aidat ->
             onAidatItemClick(aidat)
         })
-        
+
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
     }
@@ -184,7 +184,7 @@ class AidatListesiFragment : Fragment() {
         currentPage = 1
         updatePagedData()
         updatePaginationVisibility()
-        
+
         // Seçimi temizle
         adapter.clearSelection()
     }
@@ -192,7 +192,7 @@ class AidatListesiFragment : Fragment() {
     private fun updatePagedData() {
         val startIndex = (currentPage - 1) * pageSize
         val endIndex = minOf(startIndex + pageSize, filteredAidatList.size)
-        
+
         val pagedList = if (filteredAidatList.isNotEmpty()) {
             filteredAidatList.subList(startIndex, endIndex)
         } else {
@@ -205,10 +205,10 @@ class AidatListesiFragment : Fragment() {
 
     private fun updatePaginationButtons() {
         val totalPages = getTotalPages()
-        
+
         btnPrevPage.isEnabled = currentPage > 1
         btnNextPage.isEnabled = currentPage < totalPages
-        
+
         tvPageInfo.text = "Sayfa $currentPage/$totalPages (Toplam: ${filteredAidatList.size})"
     }
 
@@ -231,6 +231,16 @@ class AidatListesiFragment : Fragment() {
         val activity = requireActivity() as AdminAidatActivity
         val userEmail = activity.fragmentUserEmail
         val userType = activity.fragmentUserType
+
+        println("🔍 AidatListesiFragment - loadAdminAidatData")
+        println("🔍 User Email from activity: $userEmail")
+        println("🔍 User Type from activity: $userType")
+
+        if (userEmail.isEmpty() || userType.isEmpty()) {
+            Toast.makeText(requireContext(), "Kullanıcı bilgileri yüklenemedi. Lütfen tekrar giriş yapın.", Toast.LENGTH_LONG).show()
+            progressBar.visibility = View.GONE
+            return
+        }
 
         AidatApiService.getAndroidDues(
             userEmail = userEmail,
@@ -304,7 +314,7 @@ class AidatListesiFragment : Fragment() {
 
             allAidatList = aidatList
             filteredAidatList = aidatList
-            
+
             updateStatistics(totalAmount, paidAmount, pendingAmount, lateFeeTotal)
             applyFilters()
 
@@ -320,24 +330,20 @@ class AidatListesiFragment : Fragment() {
         tvPaidAmount.text = "₺${"%.2f".format(paid)}"
         tvPendingAmount.text = "₺${"%.2f".format(pending)}"
         tvLateFeeTotal.text = "₺${"%.2f".format(lateFee)}"
-        
+
         cardStats.visibility = View.VISIBLE
     }
 
     // Aidat item'ına tıklandığında
     private fun onAidatItemClick(aidat: Aidat) {
-        // Burada ek işlemler yapabilirsiniz
-        // Örneğin: Toast mesajı gösterme, log yazdırma vb.
-        println("🔍 Seçilen aidat: ${aidat.userName} - ${aidat.description}")
-        
-        // İsterseniz burada detay dialog'u gösterebilirsiniz
         showAidatDetailDialog(aidat)
     }
 
-    // Detay dialog'u göster (opsiyonel)
+    // Detay dialog'u göster
     private fun showAidatDetailDialog(aidat: Aidat) {
         val numberFormat = NumberFormat.getCurrencyInstance(Locale("tr", "TR"))
-        
+        val totalAmount = aidat.amount + aidat.lateFeeAmount
+
         val message = """
             👤 Sakin: ${aidat.userName}
             📧 Email: ${aidat.kullanici_email}
@@ -345,10 +351,12 @@ class AidatListesiFragment : Fragment() {
             
             💰 Orijinal Tutar: ${numberFormat.format(aidat.amount)}
             ⚡ Gecikme Zammı: ${numberFormat.format(aidat.lateFeeAmount)}
-            💵 Toplam Tutar: ${numberFormat.format(aidat.amount + aidat.lateFeeAmount)}
+            💵 Toplam Tutar: ${numberFormat.format(totalAmount)}
             
             📅 Son Ödeme: ${formatDate(aidat.son_tarih)}
             ✅ Durum: ${getStatusText(aidat.durum)}
+            
+            ${if (!aidat.odeme_tarihi.isNullOrEmpty()) "🗓️ Ödeme Tarihi: ${formatDate(aidat.odeme_tarihi)}" else ""}
             
             📝 Açıklama: ${aidat.description}
         """.trimIndent()
@@ -360,68 +368,208 @@ class AidatListesiFragment : Fragment() {
                 dialog.dismiss()
             }
             .setNeutralButton("Ödeme Yap") { dialog, _ ->
-                // Ödeme yapma işlemi buraya eklenebilir
                 showPaymentDialog(aidat)
                 dialog.dismiss()
             }
             .show()
     }
 
-    // Ödeme dialog'u (opsiyonel)
-    // Ödeme dialog'u
+    // PROFESYONEL ÖDEME DİALOG'U
     private fun showPaymentDialog(aidat: Aidat) {
         val numberFormat = NumberFormat.getCurrencyInstance(Locale("tr", "TR"))
         val totalAmount = aidat.amount + aidat.lateFeeAmount
 
-        val view = layoutInflater.inflate(R.layout.dialog_payment, null)
-        val etPaymentAmount = view.findViewById<EditText>(R.id.etPaymentAmount)
-        val spinnerPaymentMethod = view.findViewById<Spinner>(R.id.spinnerPaymentMethod)
-        val etPaymentNotes = view.findViewById<EditText>(R.id.etPaymentNotes)
+        // Dialog layout'u oluştur
+        val layout = LinearLayout(requireContext())
+        layout.orientation = LinearLayout.VERTICAL
+        layout.setPadding(50, 30, 50, 30)
 
-        // Ödeme yöntemleri
-        val paymentMethods = arrayOf("Nakit", "Banka Havalesi", "Kredi Kartı", "Diğer")
+        // Borç bilgileri
+        val tvDebtInfo = TextView(requireContext())
+        tvDebtInfo.text = "📋 ${aidat.userName} - ${aidat.description}"
+        tvDebtInfo.textSize = 16f
+        tvDebtInfo.setPadding(0, 0, 0, 20)
+        layout.addView(tvDebtInfo)
+
+        // Tutar bilgileri
+        val layoutAmounts = LinearLayout(requireContext())
+        layoutAmounts.orientation = LinearLayout.VERTICAL
+
+        val tvOriginal = TextView(requireContext())
+        tvOriginal.text = "💰 Orijinal Tutar: ${numberFormat.format(aidat.amount)}"
+        tvOriginal.textSize = 14f
+        layoutAmounts.addView(tvOriginal)
+
+        val tvLateFee = TextView(requireContext())
+        tvLateFee.text = "⚡ Gecikme Zammı: ${numberFormat.format(aidat.lateFeeAmount)}"
+        tvLateFee.textSize = 14f
+        layoutAmounts.addView(tvLateFee)
+
+        val tvTotal = TextView(requireContext())
+        tvTotal.text = "💵 Toplam Borç: ${numberFormat.format(totalAmount)}"
+        tvTotal.textSize = 16f
+        tvTotal.setTypeface(tvTotal.typeface, android.graphics.Typeface.BOLD)
+        tvTotal.setPadding(0, 10, 0, 20)
+        layoutAmounts.addView(tvTotal)
+
+        layout.addView(layoutAmounts)
+
+        // Tam ödeme switch
+        val switchFullPayment = Switch(requireContext())
+        switchFullPayment.text = "Tam Ödeme"
+        switchFullPayment.isChecked = true
+        switchFullPayment.setPadding(0, 0, 0, 20)
+        layout.addView(switchFullPayment)
+
+        // Ödeme tutarı
+        val tvPaymentAmountLabel = TextView(requireContext())
+        tvPaymentAmountLabel.text = "Ödeme Tutarı (₺)"
+        tvPaymentAmountLabel.textSize = 14f
+        tvPaymentAmountLabel.setPadding(0, 0, 0, 5)
+        layout.addView(tvPaymentAmountLabel)
+
+        val etPaymentAmount = EditText(requireContext())
+        etPaymentAmount.setText(totalAmount.toString())
+        etPaymentAmount.isEnabled = false
+        etPaymentAmount.inputType = android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
+        etPaymentAmount.setBackgroundResource(R.drawable.edittext_background)
+        etPaymentAmount.setPadding(40, 20, 40, 20)
+        layout.addView(etPaymentAmount)
+
+        // Switch listener
+        switchFullPayment.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                etPaymentAmount.setText(totalAmount.toString())
+                etPaymentAmount.isEnabled = false
+            } else {
+                etPaymentAmount.setText("")
+                etPaymentAmount.isEnabled = true
+                etPaymentAmount.requestFocus()
+            }
+        }
+
+        // Ödeme yöntemi
+        val tvPaymentMethodLabel = TextView(requireContext())
+        tvPaymentMethodLabel.text = "Ödeme Yöntemi"
+        tvPaymentMethodLabel.textSize = 14f
+        tvPaymentMethodLabel.setPadding(0, 20, 0, 5)
+        layout.addView(tvPaymentMethodLabel)
+
+        val spinnerPaymentMethod = Spinner(requireContext())
+        val paymentMethods = arrayOf("Nakit", "Banka Havalesi", "Kredi Kartı", "Çek", "Diğer")
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, paymentMethods)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerPaymentMethod.adapter = adapter
+        layout.addView(spinnerPaymentMethod)
 
-        // Varsayılan değerleri ayarla
-        etPaymentAmount.setText(totalAmount.toString())
+        // Notlar
+        val tvNotesLabel = TextView(requireContext())
+        tvNotesLabel.text = "Notlar (Opsiyonel)"
+        tvNotesLabel.textSize = 14f
+        tvNotesLabel.setPadding(0, 20, 0, 5)
+        layout.addView(tvNotesLabel)
+
+        val etPaymentNotes = EditText(requireContext())
+        etPaymentNotes.hint = "Ödeme notu ekleyin..."
+        etPaymentNotes.setBackgroundResource(R.drawable.edittext_background)
+        etPaymentNotes.setPadding(40, 20, 40, 20)
+        layout.addView(etPaymentNotes)
 
         val dialog = AlertDialog.Builder(requireContext())
             .setTitle("Ödeme İşlemi")
-            .setView(view)
-            .setPositiveButton("Ödemeyi Tamamla") { dialog, _ ->
+            .setView(layout)
+            .setPositiveButton("Ödemeyi Tamamla") { dialogInterface, _ ->
                 val paymentAmount = etPaymentAmount.text.toString().toDoubleOrNull()
                 val paymentMethod = spinnerPaymentMethod.selectedItem.toString()
-                val notes = etPaymentNotes.text.toString()
+                val notes = etPaymentNotes.text.toString().trim()
 
                 if (paymentAmount == null || paymentAmount <= 0) {
                     Toast.makeText(requireContext(), "Lütfen geçerli bir ödeme tutarı girin", Toast.LENGTH_SHORT).show()
                     return@setPositiveButton
                 }
 
+                if (paymentAmount > totalAmount) {
+                    Toast.makeText(requireContext(), "Ödeme tutarı toplam borçtan fazla olamaz", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+
                 if (paymentAmount < totalAmount) {
-                    // Kısmi ödeme uyarısı
-                    AlertDialog.Builder(requireContext())
-                        .setTitle("Kısmi Ödeme")
-                        .setMessage("Ödeme tutarı toplam borçtan az. Kısmi ödeme yapmak istiyor musunuz?")
-                        .setPositiveButton("Evet, Kısmi Ödeme Yap") { _, _ ->
-                            processPayment(aidat, paymentAmount, paymentMethod, notes)
-                            dialog.dismiss()
-                        }
-                        .setNegativeButton("İptal", null)
-                        .show()
+                    // Kısmi ödeme onayı
+                    showPartialPaymentConfirmation(aidat, paymentAmount, paymentMethod, notes, dialogInterface)
                 } else {
-                    processPayment(aidat, paymentAmount, paymentMethod, notes)
-                    dialog.dismiss()
+                    // Tam ödeme onayı
+                    showFullPaymentConfirmation(aidat, paymentAmount, paymentMethod, notes, dialogInterface)
                 }
             }
-            .setNegativeButton("İptal") { dialog, _ ->
-                dialog.dismiss()
+            .setNegativeButton("İptal") { dialogInterface, _ ->
+                dialogInterface.dismiss()
             }
             .create()
 
         dialog.show()
+    }
+
+    private fun showPartialPaymentConfirmation(aidat: Aidat, amount: Double, method: String, notes: String, dialog: android.content.DialogInterface) {
+        val numberFormat = NumberFormat.getCurrencyInstance(Locale("tr", "TR"))
+        val totalAmount = aidat.amount + aidat.lateFeeAmount
+        val remaining = totalAmount - amount
+
+        val message = """
+            ⚠️ **KISMI ÖDEME**
+            
+            👤 Sakin: ${aidat.userName}
+            💰 Toplam Borç: ${numberFormat.format(totalAmount)}
+            💵 Ödeme Tutarı: ${numberFormat.format(amount)}
+            📉 Kalan Borç: ${numberFormat.format(remaining)}
+            
+            **Kısmi ödeme yapmak istiyor musunuz?**
+        """.trimIndent()
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Kısmi Ödeme Onayı")
+            .setMessage(message)
+            .setPositiveButton("Evet, Kısmi Ödeme Yap") { innerDialog, _ ->
+                innerDialog.dismiss()
+                dialog.dismiss()
+                processPayment(aidat, amount, method, notes)
+            }
+            .setNegativeButton("İptal") { innerDialog, _ ->
+                innerDialog.dismiss()
+            }
+            .setNeutralButton("Tam Ödeme Yap") { innerDialog, _ ->
+                innerDialog.dismiss()
+                // Dialog'u kapat ve tam ödeme yap
+                dialog.dismiss()
+                showPaymentDialog(aidat) // Yeniden aç ve tam ödeme yap
+            }
+            .show()
+    }
+
+    private fun showFullPaymentConfirmation(aidat: Aidat, amount: Double, method: String, notes: String, dialog: android.content.DialogInterface) {
+        val numberFormat = NumberFormat.getCurrencyInstance(Locale("tr", "TR"))
+
+        val message = """
+            ✅ **TAM ÖDEME**
+            
+            👤 Sakin: ${aidat.userName}
+            💰 Ödeme Tutarı: ${numberFormat.format(amount)}
+            💳 Ödeme Yöntemi: $method
+            
+            **Tam ödemeyi onaylıyor musunuz?**
+        """.trimIndent()
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Tam Ödeme Onayı")
+            .setMessage(message)
+            .setPositiveButton("Evet, Ödemeyi Tamamla") { innerDialog, _ ->
+                innerDialog.dismiss()
+                dialog.dismiss()
+                processPayment(aidat, amount, method, notes)
+            }
+            .setNegativeButton("İptal") { innerDialog, _ ->
+                innerDialog.dismiss()
+            }
+            .show()
     }
 
     // Ödeme işlemini gerçekleştir
@@ -430,9 +578,26 @@ class AidatListesiFragment : Fragment() {
         val userEmail = activity.fragmentUserEmail
         val userType = activity.fragmentUserType
 
+        println("🔍 =========== PROCESS PAYMENT DEBUG ===========")
+        println("🔍 Fragment Activity: ${activity.javaClass.simpleName}")
+        println("🔍 User Email from activity: $userEmail")
+        println("🔍 User Type from activity: $userType")
+        println("🔍 Aidat ID: ${aidat.id}")
+        println("🔍 Payment Amount: $paymentAmount")
+        println("🔍 Payment Method: $paymentMethod")
+        println("🔍 Notes: $notes")
+        println("🔍 ===========================================")
+
+        if (userEmail.isEmpty() || userType.isEmpty()) {
+            Toast.makeText(requireContext(),
+                "Kullanıcı bilgileri eksik!\nEmail: $userEmail\nType: $userType\nLütfen tekrar giriş yapın.",
+                Toast.LENGTH_LONG).show()
+            return
+        }
+
         // Progress göster
         val progressDialog = AlertDialog.Builder(requireContext())
-            .setView(R.layout.dialog_loading)
+            .setMessage("Ödeme işleniyor...")
             .setCancelable(false)
             .create()
         progressDialog.show()
@@ -447,43 +612,47 @@ class AidatListesiFragment : Fragment() {
             onSuccess = { message ->
                 requireActivity().runOnUiThread {
                     progressDialog.dismiss()
-                    Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+
+                    // Başarı mesajı göster
+                    showPaymentSuccessDialog(aidat, paymentAmount, paymentMethod)
 
                     // Listeyi yenile
                     loadAdminAidatData()
 
                     // Seçimi temizle
                     adapter.clearSelection()
-
-                    // Başarı mesajı göster
-                    showPaymentSuccessDialog(aidat, paymentAmount)
                 }
             },
             onError = { error ->
                 requireActivity().runOnUiThread {
                     progressDialog.dismiss()
-                    Toast.makeText(requireContext(), "Ödeme hatası: $error", Toast.LENGTH_LONG).show()
 
-                    // Hata dialog'u göster
-                    showPaymentErrorDialog(error)
+                    // DEBUG: Hata detayı
+                    println("❌ processPayment - Error: $error")
+
+                    // Hata mesajı göster
+                    showPaymentErrorDialog(error, aidat)
                 }
             }
         )
     }
 
-    // Ödeme başarı dialog'u
-    private fun showPaymentSuccessDialog(aidat: Aidat, paymentAmount: Double) {
+    private fun showPaymentSuccessDialog(aidat: Aidat, amount: Double, method: String) {
         val numberFormat = NumberFormat.getCurrencyInstance(Locale("tr", "TR"))
+        val currentDate = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault()).format(Date())
 
         val message = """
-        ✅ Ödeme Başarılı!
-        
-        👤 Sakin: ${aidat.userName}
-        💰 Ödenen Tutar: ${numberFormat.format(paymentAmount)}
-        📅 Tarih: ${SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(Date())}
-        
-        Aidat durumu 'Ödendi' olarak güncellendi.
-    """.trimIndent()
+            ✅ **ÖDEME BAŞARILI**
+            
+            👤 Sakin: ${aidat.userName}
+            💰 Ödenen Tutar: ${numberFormat.format(amount)}
+            💳 Ödeme Yöntemi: $method
+            📅 Tarih: $currentDate
+            
+            Fiş No: ${System.currentTimeMillis().toString().takeLast(8)}
+            
+            Aidat durumu güncellendi.
+        """.trimIndent()
 
         AlertDialog.Builder(requireContext())
             .setTitle("Ödeme Tamamlandı")
@@ -491,25 +660,39 @@ class AidatListesiFragment : Fragment() {
             .setPositiveButton("Tamam") { dialog, _ ->
                 dialog.dismiss()
             }
-            .show()
-    }
-
-    // Ödeme hata dialog'u
-    private fun showPaymentErrorDialog(error: String) {
-        AlertDialog.Builder(requireContext())
-            .setTitle("Ödeme Hatası")
-            .setMessage("Ödeme işlemi sırasında bir hata oluştu:\n\n$error\n\nLütfen daha sonra tekrar deneyin.")
-            .setPositiveButton("Tamam") { dialog, _ ->
+            .setNeutralButton("Fiş Yazdır") { dialog, _ ->
+                Toast.makeText(requireContext(), "Fiş yazdırma işlemi başlatıldı", Toast.LENGTH_SHORT).show()
                 dialog.dismiss()
             }
             .show()
     }
-    /*
-    private fun makePayment(aidatId: Int, amount: Double) {
-        // Ödeme işlemi burada yapılacak
-        Toast.makeText(requireContext(), "Ödeme işlemi başlatılıyor...", Toast.LENGTH_SHORT).show()
+
+    private fun showPaymentErrorDialog(error: String, aidat: Aidat) {
+        val message = """
+            ❌ **ÖDEME HATASI**
+            
+            Hata: $error
+            
+            Lütfen:
+            1. İnternet bağlantınızı kontrol edin
+            2. Bilgilerin doğruluğunu kontrol edin
+            3. Daha sonra tekrar deneyin
+        """.trimIndent()
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Ödeme Hatası")
+            .setMessage(message)
+            .setPositiveButton("Tekrar Dene") { dialog, _ ->
+                dialog.dismiss()
+                showPaymentDialog(aidat)
+            }
+            .setNegativeButton("İptal") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
     }
-*/
+
+    // Yardımcı fonksiyonlar
     private fun formatDate(dateString: String): String {
         return try {
             val parts = dateString.split("-")

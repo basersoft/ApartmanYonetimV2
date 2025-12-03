@@ -365,7 +365,7 @@ class AidatEklemeFragment : Fragment() {
         addBulkAidat(type, amount, dueDate, description, excludePaid)
     }
 
-    // API İŞLEMLERİ
+    // API İŞLEMLERİ - DÜZELTİLMİŞ
     private fun addYearlyAidat(year: Int, monthlyAmount: Double, description: String) {
         progressBar.visibility = View.VISIBLE
 
@@ -383,7 +383,6 @@ class AidatEklemeFragment : Fragment() {
                 requireActivity().runOnUiThread {
                     progressBar.visibility = View.GONE
                     Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
-                    // Listeyi yenilemek için callback eklenebilir
                 }
             },
             onError = { error ->
@@ -435,9 +434,9 @@ class AidatEklemeFragment : Fragment() {
             bulkAmount = amount,
             bulkDueDate = dueDate,
             bulkDescription = description,
+            excludePaid = excludePaid,
             userEmail = userEmail,
             userType = userType,
-            excludePaid = excludePaid,
             onSuccess = { message ->
                 requireActivity().runOnUiThread {
                     progressBar.visibility = View.GONE
