@@ -11,12 +11,15 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import org.json.JSONObject
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.ceil
 import kotlin.math.min
+import android.os.Handler
+import android.os.Looper
+import androidx.core.content.ContextCompat
+import androidx.cardview.widget.CardView
 
 class AidatListesiFragment : Fragment() {
 
@@ -31,11 +34,12 @@ class AidatListesiFragment : Fragment() {
     private lateinit var btnPrevPage: Button
     private lateinit var btnNextPage: Button
     private lateinit var tvPageInfo: TextView
-    private lateinit var cardStats: androidx.cardview.widget.CardView
+    private lateinit var cardStats: CardView
     private lateinit var tvTotalAmount: TextView
     private lateinit var tvPaidAmount: TextView
     private lateinit var tvPendingAmount: TextView
     private lateinit var tvLateFeeTotal: TextView
+    private lateinit var tvPartialCount: TextView
 
     private var allAidatList: List<Aidat> = emptyList()
     private var filteredAidatList: List<Aidat> = emptyList()
@@ -71,11 +75,16 @@ class AidatListesiFragment : Fragment() {
         tvPaidAmount = view.findViewById(R.id.tvPaidAmount)
         tvPendingAmount = view.findViewById(R.id.tvPendingAmount)
         tvLateFeeTotal = view.findViewById(R.id.tvLateFeeTotal)
+        tvPartialCount = view.findViewById(R.id.tvPartialCount)
 
-        // Adapter'ı click listener ile oluştur
-        adapter = AdminAidatAdapter(onItemClick = { aidat ->
-            onAidatItemClick(aidat)
-        })
+        adapter = AdminAidatAdapter(
+            onItemClick = { aidat ->
+                onAidatItemClick(aidat)
+            },
+            onPaymentHistoryClick = { aidat ->
+                showPaymentHistoryDialog(aidat)
+            }
+        )
 
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
@@ -83,13 +92,13 @@ class AidatListesiFragment : Fragment() {
 
     private fun setupFilters() {
         // Durum filtreleme
-        val statusOptions = arrayOf("Tümü", "Ödendi", "Bekliyor", "Gecikmiş")
+        val statusOptions = arrayOf("Tümü", "Ödendi", "Bekliyor", "Gecikmiş", "Kısmi Ödenmiş")
         val statusAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, statusOptions)
         statusAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerStatusFilter.adapter = statusAdapter
 
         // Gruplama seçenekleri
-        val groupOptions = arrayOf("Gruplama Yok", "Kullanıcıya Göre", "Duruma Göre")
+        val groupOptions = arrayOf("Gruplama Yok", "Kullanıcıya Göre", "Duruma Göre", "Ödeme Durumuna Göre")
         val groupAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, groupOptions)
         groupAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerGroupBy.adapter = groupAdapter
@@ -152,14 +161,16 @@ class AidatListesiFragment : Fragment() {
             val matchesSearch = searchText.isEmpty() ||
                     aidat.userName.lowercase().contains(searchText) ||
                     aidat.kullanici_email.lowercase().contains(searchText) ||
-                    "${aidat.apartmentBlock}${aidat.apartmentNumber}".lowercase().contains(searchText) ||
-                    aidat.description.lowercase().contains(searchText)
+                    (aidat.apartmentBlock + aidat.apartmentNumber).lowercase().contains(searchText) ||
+                    aidat.description.lowercase().contains(searchText) ||
+                    aidat.receiptNumber.lowercase().contains(searchText)
 
             val matchesStatus = when (selectedStatus) {
                 "Tümü" -> true
-                "Ödendi" -> aidat.durum.lowercase() == "paid"
-                "Bekliyor" -> aidat.durum.lowercase() == "pending"
-                "Gecikmiş" -> aidat.durum.lowercase() == "overdue"
+                "Ödendi" -> aidat.isFullyPaid
+                "Bekliyor" -> aidat.isPending
+                "Gecikmiş" -> aidat.isReallyOverdue  // DEĞİŞTİRİLDİ: isOverdue yerine isReallyOverdue
+                "Kısmi Ödenmiş" -> aidat.isPartiallyPaid
                 else -> true
             }
 
@@ -179,14 +190,18 @@ class AidatListesiFragment : Fragment() {
             "Duruma Göre" -> {
                 filteredAidatList = filteredAidatList.sortedBy { it.durum }
             }
+            "Ödeme Durumuna Göre" -> {
+                filteredAidatList = filteredAidatList.sortedWith(compareBy(
+                    { !it.isFullyPaid },
+                    { !it.isPartiallyPaid },
+                    { it.durum }
+                ))
+            }
         }
 
         currentPage = 1
         updatePagedData()
         updatePaginationVisibility()
-
-        // Seçimi temizle
-        adapter.clearSelection()
     }
 
     private fun updatePagedData() {
@@ -227,14 +242,9 @@ class AidatListesiFragment : Fragment() {
     private fun loadAdminAidatData() {
         progressBar.visibility = View.VISIBLE
 
-        // Activity'den user bilgilerini al
         val activity = requireActivity() as AdminAidatActivity
         val userEmail = activity.fragmentUserEmail
         val userType = activity.fragmentUserType
-
-        println("🔍 AidatListesiFragment - loadAdminAidatData")
-        println("🔍 User Email from activity: $userEmail")
-        println("🔍 User Type from activity: $userType")
 
         if (userEmail.isEmpty() || userType.isEmpty()) {
             Toast.makeText(requireContext(), "Kullanıcı bilgileri yüklenemedi. Lütfen tekrar giriş yapın.", Toast.LENGTH_LONG).show()
@@ -245,13 +255,13 @@ class AidatListesiFragment : Fragment() {
         AidatApiService.getAndroidDues(
             userEmail = userEmail,
             userType = userType,
-            onSuccess = { data ->
+            onSuccess = { aidatList: List<Aidat> ->
                 requireActivity().runOnUiThread {
                     progressBar.visibility = View.GONE
-                    handleAndroidAidatData(data)
+                    handleAndroidAidatData(aidatList)
                 }
             },
-            onError = { error ->
+            onError = { error: String ->
                 requireActivity().runOnUiThread {
                     progressBar.visibility = View.GONE
                     Toast.makeText(requireContext(), "Veri yükleme hatası: $error", Toast.LENGTH_LONG).show()
@@ -260,76 +270,42 @@ class AidatListesiFragment : Fragment() {
         )
     }
 
-    private fun handleAndroidAidatData(data: JSONObject) {
+    private fun handleAndroidAidatData(aidatList: List<Aidat>) {
         try {
-            val duesArray = data.getJSONArray("dues")
-            val aidatList = mutableListOf<Aidat>()
-
-            var totalAmount = 0.0
-            var paidAmount = 0.0
-            var pendingAmount = 0.0
-            var lateFeeTotal = 0.0
-
-            for (i in 0 until duesArray.length()) {
-                val item = duesArray.getJSONObject(i)
-
-                val amount = item.getDouble("amount")
-                val lateFee = item.getDouble("late_fee_amount")
-                val status = item.getString("status")
-
-                totalAmount += amount + lateFee
-                lateFeeTotal += lateFee
-
-                when (status) {
-                    "paid" -> paidAmount += amount
-                    "pending", "overdue" -> pendingAmount += amount
-                }
-
-                val aidat = Aidat(
-                    ay = item.optString("description", ""),
-                    miktar = "₺${"%.2f".format(amount)}",
-                    durum = status,
-                    durumRenk = when (status.lowercase()) {
-                        "paid" -> "#2ecc71"
-                        "pending" -> "#f39c12"
-                        "overdue" -> "#e74c3c"
-                        else -> "#95a5a6"
-                    },
-                    son_tarih = item.getString("due_date"),
-                    odeme_tarihi = if (item.has("payment_date") && !item.isNull("payment_date"))
-                        item.getString("payment_date") else null,
-                    kullanici_adi = item.getString("user_name"),
-                    kullanici_email = item.getString("user_email"),
-                    id = item.getInt("id"),
-                    userId = item.getInt("user_id"),
-                    userName = item.getString("user_name"),
-                    apartmentBlock = item.getString("apartment_block"),
-                    apartmentNumber = item.getString("apartment_number"),
-                    description = item.optString("description", ""),
-                    lateFeeAmount = lateFee,
-                    amount = amount
-                )
-                aidatList.add(aidat)
-            }
-
             allAidatList = aidatList
             filteredAidatList = aidatList
-
-            updateStatistics(totalAmount, paidAmount, pendingAmount, lateFeeTotal)
+            updateStatistics(aidatList)
             applyFilters()
-
-            Toast.makeText(requireContext(), "${aidatList.size} aidat kaydı yüklendi", Toast.LENGTH_SHORT).show()
-
         } catch (e: Exception) {
             Toast.makeText(requireContext(), "Veri işleme hatası: ${e.message}", Toast.LENGTH_LONG).show()
         }
     }
 
-    private fun updateStatistics(total: Double, paid: Double, pending: Double, lateFee: Double) {
-        tvTotalAmount.text = "₺${"%.2f".format(total)}"
-        tvPaidAmount.text = "₺${"%.2f".format(paid)}"
-        tvPendingAmount.text = "₺${"%.2f".format(pending)}"
-        tvLateFeeTotal.text = "₺${"%.2f".format(lateFee)}"
+    private fun updateStatistics(aidatList: List<Aidat>) {
+        var totalAmount = 0.0
+        var paidAmount = 0.0
+        var pendingAmount = 0.0
+        var lateFeeTotal = 0.0
+        var partialCount = 0
+
+        for (aidat in aidatList) {
+            totalAmount += aidat.calculatedTotalAmount
+            paidAmount += aidat.paidAmount
+            pendingAmount += aidat.calculatedRemainingAmount
+            lateFeeTotal += aidat.lateFeeAmount
+
+            if (aidat.isPartiallyPaid) {
+                partialCount++
+            }
+        }
+
+        val numberFormat = NumberFormat.getCurrencyInstance(Locale("tr", "TR"))
+
+        tvTotalAmount.text = numberFormat.format(totalAmount)
+        tvPaidAmount.text = numberFormat.format(paidAmount)
+        tvPendingAmount.text = numberFormat.format(pendingAmount)
+        tvLateFeeTotal.text = numberFormat.format(lateFeeTotal)
+        tvPartialCount.text = "$partialCount kısmi ödeme"
 
         cardStats.visibility = View.VISIBLE
     }
@@ -339,267 +315,427 @@ class AidatListesiFragment : Fragment() {
         showAidatDetailDialog(aidat)
     }
 
-    // Detay dialog'u göster
+    // GÜNCELLENMİŞ: Detay dialog'u
     private fun showAidatDetailDialog(aidat: Aidat) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_aidat_details, null)
+
+        // Bilgileri doldur
+        val tvDetailUserName = dialogView.findViewById<TextView>(R.id.tvDetailUserName)
+        val tvDetailUserEmail = dialogView.findViewById<TextView>(R.id.tvDetailUserEmail)
+        val tvDetailApartment = dialogView.findViewById<TextView>(R.id.tvDetailApartment)
+        val tvDetailDescription = dialogView.findViewById<TextView>(R.id.tvDetailDescription)
+        val tvDetailAmount = dialogView.findViewById<TextView>(R.id.tvDetailAmount)
+        val tvDetailLateFee = dialogView.findViewById<TextView>(R.id.tvDetailLateFee)
+        val tvDetailTotalAmount = dialogView.findViewById<TextView>(R.id.tvDetailTotalAmount)
+        val tvDetailPaidAmount = dialogView.findViewById<TextView>(R.id.tvDetailPaidAmount)
+        val tvDetailRemainingAmount = dialogView.findViewById<TextView>(R.id.tvDetailRemainingAmount)
+        val tvDetailDueDate = dialogView.findViewById<TextView>(R.id.tvDetailDueDate)
+        val tvDetailPaymentDate = dialogView.findViewById<TextView>(R.id.tvDetailPaymentDate)
+        val tvDetailPaymentStatus = dialogView.findViewById<TextView>(R.id.tvDetailPaymentStatus)
+        val tvDetailReceiptNumber = dialogView.findViewById<TextView>(R.id.tvDetailReceiptNumber)
+        val tvDetailTransactionId = dialogView.findViewById<TextView>(R.id.tvDetailTransactionId)
+        val tvDetailPaymentCount = dialogView.findViewById<TextView>(R.id.tvDetailPaymentCount)
+        val tvDetailAccountStatus = dialogView.findViewById<TextView>(R.id.tvDetailAccountStatus)
+
         val numberFormat = NumberFormat.getCurrencyInstance(Locale("tr", "TR"))
-        val totalAmount = aidat.amount + aidat.lateFeeAmount
 
-        val message = """
-            👤 Sakin: ${aidat.userName}
-            📧 Email: ${aidat.kullanici_email}
-            🏠 Daire: ${aidat.apartmentBlock} - ${aidat.apartmentNumber}
-            
-            💰 Orijinal Tutar: ${numberFormat.format(aidat.amount)}
-            ⚡ Gecikme Zammı: ${numberFormat.format(aidat.lateFeeAmount)}
-            💵 Toplam Tutar: ${numberFormat.format(totalAmount)}
-            
-            📅 Son Ödeme: ${formatDate(aidat.son_tarih)}
-            ✅ Durum: ${getStatusText(aidat.durum)}
-            
-            ${if (!aidat.odeme_tarihi.isNullOrEmpty()) "🗓️ Ödeme Tarihi: ${formatDate(aidat.odeme_tarihi)}" else ""}
-            
-            📝 Açıklama: ${aidat.description}
-        """.trimIndent()
+        // Temel bilgiler
+        tvDetailUserName.text = aidat.userName
+        tvDetailUserEmail.text = aidat.kullanici_email
+        tvDetailApartment.text = "${aidat.apartmentBlock} Blok - ${aidat.apartmentNumber}"
+        tvDetailDescription.text = aidat.description
 
-        AlertDialog.Builder(requireContext())
-            .setTitle("Aidat Detayları")
-            .setMessage(message)
-            .setPositiveButton("Tamam") { dialog, _ ->
-                dialog.dismiss()
-            }
-            .setNeutralButton("Ödeme Yap") { dialog, _ ->
-                showPaymentDialog(aidat)
-                dialog.dismiss()
-            }
-            .show()
-    }
+        // Finansal bilgiler
+        tvDetailAmount.text = numberFormat.format(aidat.amount)
+        tvDetailLateFee.text = numberFormat.format(aidat.lateFeeAmount)
+        tvDetailTotalAmount.text = numberFormat.format(aidat.calculatedTotalAmount)
+        tvDetailPaidAmount.text = numberFormat.format(aidat.paidAmount)
+        tvDetailRemainingAmount.text = numberFormat.format(aidat.calculatedRemainingAmount)
 
-    // PROFESYONEL ÖDEME DİALOG'U
-    private fun showPaymentDialog(aidat: Aidat) {
-        val numberFormat = NumberFormat.getCurrencyInstance(Locale("tr", "TR"))
-        val totalAmount = aidat.amount + aidat.lateFeeAmount
+        // Tarih bilgileri
+        tvDetailDueDate.text = formatDate(aidat.son_tarih)
+        tvDetailPaymentDate.text = if (aidat.odeme_tarihi.isNullOrEmpty()) "-" else formatDate(aidat.odeme_tarihi)
 
-        // Dialog layout'u oluştur
-        val layout = LinearLayout(requireContext())
-        layout.orientation = LinearLayout.VERTICAL
-        layout.setPadding(50, 30, 50, 30)
+        // Durum bilgileri
+        tvDetailPaymentStatus.text = aidat.formattedPaymentStatus
+        tvDetailReceiptNumber.text = if (aidat.receiptNumber.isNotEmpty()) aidat.receiptNumber else "-"
+        tvDetailTransactionId.text = if (aidat.transactionId.isNotEmpty()) aidat.transactionId else "-"
+        tvDetailPaymentCount.text = aidat.paymentCount.toString()
+        tvDetailAccountStatus.text = if (aidat.isAccounted) "Aktarıldı" else "Bekliyor"
 
-        // Borç bilgileri
-        val tvDebtInfo = TextView(requireContext())
-        tvDebtInfo.text = "📋 ${aidat.userName} - ${aidat.description}"
-        tvDebtInfo.textSize = 16f
-        tvDebtInfo.setPadding(0, 0, 0, 20)
-        layout.addView(tvDebtInfo)
-
-        // Tutar bilgileri
-        val layoutAmounts = LinearLayout(requireContext())
-        layoutAmounts.orientation = LinearLayout.VERTICAL
-
-        val tvOriginal = TextView(requireContext())
-        tvOriginal.text = "💰 Orijinal Tutar: ${numberFormat.format(aidat.amount)}"
-        tvOriginal.textSize = 14f
-        layoutAmounts.addView(tvOriginal)
-
-        val tvLateFee = TextView(requireContext())
-        tvLateFee.text = "⚡ Gecikme Zammı: ${numberFormat.format(aidat.lateFeeAmount)}"
-        tvLateFee.textSize = 14f
-        layoutAmounts.addView(tvLateFee)
-
-        val tvTotal = TextView(requireContext())
-        tvTotal.text = "💵 Toplam Borç: ${numberFormat.format(totalAmount)}"
-        tvTotal.textSize = 16f
-        tvTotal.setTypeface(tvTotal.typeface, android.graphics.Typeface.BOLD)
-        tvTotal.setPadding(0, 10, 0, 20)
-        layoutAmounts.addView(tvTotal)
-
-        layout.addView(layoutAmounts)
-
-        // Tam ödeme switch
-        val switchFullPayment = Switch(requireContext())
-        switchFullPayment.text = "Tam Ödeme"
-        switchFullPayment.isChecked = true
-        switchFullPayment.setPadding(0, 0, 0, 20)
-        layout.addView(switchFullPayment)
-
-        // Ödeme tutarı
-        val tvPaymentAmountLabel = TextView(requireContext())
-        tvPaymentAmountLabel.text = "Ödeme Tutarı (₺)"
-        tvPaymentAmountLabel.textSize = 14f
-        tvPaymentAmountLabel.setPadding(0, 0, 0, 5)
-        layout.addView(tvPaymentAmountLabel)
-
-        val etPaymentAmount = EditText(requireContext())
-        etPaymentAmount.setText(totalAmount.toString())
-        etPaymentAmount.isEnabled = false
-        etPaymentAmount.inputType = android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
-        etPaymentAmount.setBackgroundResource(R.drawable.edittext_background)
-        etPaymentAmount.setPadding(40, 20, 40, 20)
-        layout.addView(etPaymentAmount)
-
-        // Switch listener
-        switchFullPayment.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                etPaymentAmount.setText(totalAmount.toString())
-                etPaymentAmount.isEnabled = false
-            } else {
-                etPaymentAmount.setText("")
-                etPaymentAmount.isEnabled = true
-                etPaymentAmount.requestFocus()
-            }
+        // Duruma göre renkler
+        val statusColor = when {
+            aidat.isFullyPaid -> R.color.green
+            aidat.isPartiallyPaid -> R.color.orange
+            aidat.isReallyOverdue -> R.color.red  // DEĞİŞTİRİLDİ: isOverdue yerine isReallyOverdue
+            else -> R.color.blue
         }
-
-        // Ödeme yöntemi
-        val tvPaymentMethodLabel = TextView(requireContext())
-        tvPaymentMethodLabel.text = "Ödeme Yöntemi"
-        tvPaymentMethodLabel.textSize = 14f
-        tvPaymentMethodLabel.setPadding(0, 20, 0, 5)
-        layout.addView(tvPaymentMethodLabel)
-
-        val spinnerPaymentMethod = Spinner(requireContext())
-        val paymentMethods = arrayOf("Nakit", "Banka Havalesi", "Kredi Kartı", "Çek", "Diğer")
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, paymentMethods)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinnerPaymentMethod.adapter = adapter
-        layout.addView(spinnerPaymentMethod)
-
-        // Notlar
-        val tvNotesLabel = TextView(requireContext())
-        tvNotesLabel.text = "Notlar (Opsiyonel)"
-        tvNotesLabel.textSize = 14f
-        tvNotesLabel.setPadding(0, 20, 0, 5)
-        layout.addView(tvNotesLabel)
-
-        val etPaymentNotes = EditText(requireContext())
-        etPaymentNotes.hint = "Ödeme notu ekleyin..."
-        etPaymentNotes.setBackgroundResource(R.drawable.edittext_background)
-        etPaymentNotes.setPadding(40, 20, 40, 20)
-        layout.addView(etPaymentNotes)
+        tvDetailPaymentStatus.setTextColor(ContextCompat.getColor(requireContext(), statusColor))
 
         val dialog = AlertDialog.Builder(requireContext())
-            .setTitle("Ödeme İşlemi")
-            .setView(layout)
-            .setPositiveButton("Ödemeyi Tamamla") { dialogInterface, _ ->
-                val paymentAmount = etPaymentAmount.text.toString().toDoubleOrNull()
-                val paymentMethod = spinnerPaymentMethod.selectedItem.toString()
-                val notes = etPaymentNotes.text.toString().trim()
-
-                if (paymentAmount == null || paymentAmount <= 0) {
-                    Toast.makeText(requireContext(), "Lütfen geçerli bir ödeme tutarı girin", Toast.LENGTH_SHORT).show()
-                    return@setPositiveButton
-                }
-
-                if (paymentAmount > totalAmount) {
-                    Toast.makeText(requireContext(), "Ödeme tutarı toplam borçtan fazla olamaz", Toast.LENGTH_SHORT).show()
-                    return@setPositiveButton
-                }
-
-                if (paymentAmount < totalAmount) {
-                    // Kısmi ödeme onayı
-                    showPartialPaymentConfirmation(aidat, paymentAmount, paymentMethod, notes, dialogInterface)
-                } else {
-                    // Tam ödeme onayı
-                    showFullPaymentConfirmation(aidat, paymentAmount, paymentMethod, notes, dialogInterface)
-                }
-            }
-            .setNegativeButton("İptal") { dialogInterface, _ ->
-                dialogInterface.dismiss()
-            }
+            .setView(dialogView)
             .create()
 
+        // Buton tıklamaları
+        dialogView.findViewById<Button>(R.id.btnPaymentHistory).setOnClickListener {
+            dialog.dismiss()
+            showPaymentHistoryDialog(aidat)
+        }
+
+        dialogView.findViewById<Button>(R.id.btnMakePayment).setOnClickListener {
+            dialog.dismiss()
+            showPaymentDialog(aidat)
+        }
+
+        dialogView.findViewById<Button>(R.id.btnClose).setOnClickListener {
+            dialog.dismiss()
+        }
+
+        // Dialog arkaplanını şeffaf yap
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         dialog.show()
     }
 
-    private fun showPartialPaymentConfirmation(aidat: Aidat, amount: Double, method: String, notes: String, dialog: android.content.DialogInterface) {
-        val numberFormat = NumberFormat.getCurrencyInstance(Locale("tr", "TR"))
-        val totalAmount = aidat.amount + aidat.lateFeeAmount
-        val remaining = totalAmount - amount
-
-        val message = """
-            ⚠️ **KISMI ÖDEME**
-            
-            👤 Sakin: ${aidat.userName}
-            💰 Toplam Borç: ${numberFormat.format(totalAmount)}
-            💵 Ödeme Tutarı: ${numberFormat.format(amount)}
-            📉 Kalan Borç: ${numberFormat.format(remaining)}
-            
-            **Kısmi ödeme yapmak istiyor musunuz?**
-        """.trimIndent()
-
-        AlertDialog.Builder(requireContext())
-            .setTitle("Kısmi Ödeme Onayı")
-            .setMessage(message)
-            .setPositiveButton("Evet, Kısmi Ödeme Yap") { innerDialog, _ ->
-                innerDialog.dismiss()
-                dialog.dismiss()
-                processPayment(aidat, amount, method, notes)
-            }
-            .setNegativeButton("İptal") { innerDialog, _ ->
-                innerDialog.dismiss()
-            }
-            .setNeutralButton("Tam Ödeme Yap") { innerDialog, _ ->
-                innerDialog.dismiss()
-                // Dialog'u kapat ve tam ödeme yap
-                dialog.dismiss()
-                showPaymentDialog(aidat) // Yeniden aç ve tam ödeme yap
-            }
-            .show()
-    }
-
-    private fun showFullPaymentConfirmation(aidat: Aidat, amount: Double, method: String, notes: String, dialog: android.content.DialogInterface) {
-        val numberFormat = NumberFormat.getCurrencyInstance(Locale("tr", "TR"))
-
-        val message = """
-            ✅ **TAM ÖDEME**
-            
-            👤 Sakin: ${aidat.userName}
-            💰 Ödeme Tutarı: ${numberFormat.format(amount)}
-            💳 Ödeme Yöntemi: $method
-            
-            **Tam ödemeyi onaylıyor musunuz?**
-        """.trimIndent()
-
-        AlertDialog.Builder(requireContext())
-            .setTitle("Tam Ödeme Onayı")
-            .setMessage(message)
-            .setPositiveButton("Evet, Ödemeyi Tamamla") { innerDialog, _ ->
-                innerDialog.dismiss()
-                dialog.dismiss()
-                processPayment(aidat, amount, method, notes)
-            }
-            .setNegativeButton("İptal") { innerDialog, _ ->
-                innerDialog.dismiss()
-            }
-            .show()
-    }
-
-    // Ödeme işlemini gerçekleştir
-    private fun processPayment(aidat: Aidat, paymentAmount: Double, paymentMethod: String, notes: String) {
+    // Ödeme geçmişi dialog'u
+    private fun showPaymentHistoryDialog(aidat: Aidat) {
         val activity = requireActivity() as AdminAidatActivity
         val userEmail = activity.fragmentUserEmail
         val userType = activity.fragmentUserType
 
-        println("🔍 =========== PROCESS PAYMENT DEBUG ===========")
-        println("🔍 Fragment Activity: ${activity.javaClass.simpleName}")
-        println("🔍 User Email from activity: $userEmail")
-        println("🔍 User Type from activity: $userType")
-        println("🔍 Aidat ID: ${aidat.id}")
-        println("🔍 Payment Amount: $paymentAmount")
-        println("🔍 Payment Method: $paymentMethod")
-        println("🔍 Notes: $notes")
-        println("🔍 ===========================================")
-
-        if (userEmail.isEmpty() || userType.isEmpty()) {
-            Toast.makeText(requireContext(),
-                "Kullanıcı bilgileri eksik!\nEmail: $userEmail\nType: $userType\nLütfen tekrar giriş yapın.",
-                Toast.LENGTH_LONG).show()
-            return
-        }
-
-        // Progress göster
         val progressDialog = AlertDialog.Builder(requireContext())
-            .setMessage("Ödeme işleniyor...")
+            .setMessage("Ödeme geçmişi yükleniyor...")
             .setCancelable(false)
             .create()
+        progressDialog.show()
+
+        AidatApiService.getPaymentHistory(
+            userEmail = userEmail,
+            userType = userType,
+            dueId = aidat.id,
+            onSuccess = { paymentList: List<AidatApiService.PaymentHistory> ->
+                requireActivity().runOnUiThread {
+                    progressDialog.dismiss()
+                    displayPaymentHistoryDialog(paymentList, aidat)
+                }
+            },
+            onError = { error: String ->
+                requireActivity().runOnUiThread {
+                    progressDialog.dismiss()
+                    Toast.makeText(requireContext(), "Ödeme geçmişi yüklenemedi: $error", Toast.LENGTH_LONG).show()
+                }
+            }
+        )
+    }
+
+    private fun displayPaymentHistoryDialog(paymentList: List<AidatApiService.PaymentHistory>, aidat: Aidat) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_payment_history, null)
+
+        // Üst bilgiler
+        val tvHistoryUserName = dialogView.findViewById<TextView>(R.id.tvHistoryUserName)
+        val tvHistoryApartment = dialogView.findViewById<TextView>(R.id.tvHistoryApartment)
+        val tvHistoryTotalDebt = dialogView.findViewById<TextView>(R.id.tvHistoryTotalDebt)
+        val tvHistoryTotalPaid = dialogView.findViewById<TextView>(R.id.tvHistoryTotalPaid)
+        val tvHistoryRemaining = dialogView.findViewById<TextView>(R.id.tvHistoryRemaining)
+        val tvRecordCount = dialogView.findViewById<TextView>(R.id.tvRecordCount)
+
+        val numberFormat = NumberFormat.getCurrencyInstance(Locale("tr", "TR"))
+
+        tvHistoryUserName.text = aidat.userName
+        tvHistoryApartment.text = "${aidat.apartmentBlock} - ${aidat.apartmentNumber}"
+        tvHistoryTotalDebt.text = numberFormat.format(aidat.calculatedTotalAmount)
+        tvHistoryTotalPaid.text = numberFormat.format(aidat.paidAmount)
+        tvHistoryRemaining.text = numberFormat.format(aidat.calculatedRemainingAmount)
+        tvRecordCount.text = "${paymentList.size} kayıt"
+
+        // ListView için adapter
+        val listView = dialogView.findViewById<ListView>(R.id.listViewPayments)
+        val adapter = PaymentHistoryAdapter(paymentList)
+        listView.adapter = adapter
+
+        val dialog = AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .create()
+
+        dialogView.findViewById<Button>(R.id.btnCloseHistory).setOnClickListener {
+            dialog.dismiss()
+        }
+
+        // Dialog arkaplanını şeffaf yap
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.show()
+    }
+
+    // Ödeme dialog'u
+    private fun showPaymentDialog(aidat: Aidat) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_make_payment, null)
+
+        val tvDialogTitle = dialogView.findViewById<TextView>(R.id.tvDialogTitle)
+        val tvPaymentInfo = dialogView.findViewById<TextView>(R.id.tvPaymentInfo)
+        val tvOriginalAmount = dialogView.findViewById<TextView>(R.id.tvOriginalAmount)
+        val tvLateFeeAmount = dialogView.findViewById<TextView>(R.id.tvLateFeeAmount)
+        val tvTotalAmount = dialogView.findViewById<TextView>(R.id.tvTotalAmount)
+        val tvPaidAmount = dialogView.findViewById<TextView>(R.id.tvPaidAmount)
+        val tvRemainingAmount = dialogView.findViewById<TextView>(R.id.tvRemainingAmount)
+        val etPaymentAmount = dialogView.findViewById<EditText>(R.id.etPaymentAmount)
+        val spPaymentMethod = dialogView.findViewById<Spinner>(R.id.spPaymentMethod)
+        val etPaymentNotes = dialogView.findViewById<EditText>(R.id.etPaymentNotes)
+        val rgPaymentType = dialogView.findViewById<RadioGroup>(R.id.rgPaymentType)
+        val rbFullPayment = dialogView.findViewById<RadioButton>(R.id.rbFullPayment)
+        val rbPartialPayment = dialogView.findViewById<RadioButton>(R.id.rbPartialPayment)
+
+        val numberFormat = NumberFormat.getCurrencyInstance(Locale("tr", "TR"))
+
+        // Başlık ve bilgiler
+        tvDialogTitle.text = "💳 ${aidat.userName} - Ödeme İşlemi"
+        tvPaymentInfo.text = "${aidat.apartmentBlock} - ${aidat.apartmentNumber} • ${aidat.description}"
+
+        // Finansal bilgiler
+        tvOriginalAmount.text = "Orijinal Tutar: ${numberFormat.format(aidat.amount)}"
+
+        // Gecikme cezası bilgisi
+        if (aidat.lateFeeAmount > 0) {
+            tvLateFeeAmount.visibility = View.VISIBLE
+            tvLateFeeAmount.text = "Gecikme Cezası: ${numberFormat.format(aidat.lateFeeAmount)} (${aidat.daysLate} gün)"
+            tvLateFeeAmount.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
+        } else {
+            tvLateFeeAmount.visibility = View.GONE
+        }
+
+        tvTotalAmount.text = "Toplam Borç: ${numberFormat.format(aidat.calculatedTotalAmount)}"
+        tvPaidAmount.text = "Ödenen: ${numberFormat.format(aidat.paidAmount)}"
+        tvRemainingAmount.text = "Kalan Borç: ${numberFormat.format(aidat.calculatedRemainingAmount)}"
+
+        // Varsayılan ödeme tutarı
+        etPaymentAmount.setText(aidat.calculatedRemainingAmount.toString())
+
+        // Ödeme yöntemi spinner'ı
+        val paymentMethods = arrayOf("Nakit", "Banka Havalesi", "Kredi Kartı", "Çek", "EFT", "Diğer")
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, paymentMethods)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spPaymentMethod.adapter = adapter
+
+        // Radio button listener
+        rgPaymentType.setOnCheckedChangeListener { _, checkedId ->
+            when (checkedId) {
+                R.id.rbFullPayment -> {
+                    etPaymentAmount.setText(aidat.calculatedRemainingAmount.toString())
+                    etPaymentAmount.isEnabled = false
+                }
+                R.id.rbPartialPayment -> {
+                    etPaymentAmount.setText("")
+                    etPaymentAmount.isEnabled = true
+                    etPaymentAmount.requestFocus()
+                }
+            }
+        }
+
+        // Varsayılan olarak tam ödeme seçili
+        rbFullPayment.isChecked = true
+
+        val dialog = AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .create()
+
+        // Buton tıklamaları
+        dialogView.findViewById<Button>(R.id.btnCancel).setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialogView.findViewById<Button>(R.id.btnMakePayment).setOnClickListener {
+            val paymentAmount = etPaymentAmount.text.toString().toDoubleOrNull()
+            val paymentMethodText = spPaymentMethod.selectedItem.toString()
+            val notes = etPaymentNotes.text.toString().trim()
+            val isFullPayment = rgPaymentType.checkedRadioButtonId == R.id.rbFullPayment
+
+            // Ödeme yöntemi kodunu belirle
+            val paymentMethod = when (paymentMethodText) {
+                "Nakit" -> "cash"
+                "Banka Havalesi" -> "bank_transfer"
+                "Kredi Kartı" -> "credit_card"
+                "Çek" -> "check"
+                "EFT" -> "eft"
+                else -> "other"
+            }
+
+            // Validasyon
+            if (paymentAmount == null || paymentAmount <= 0) {
+                Toast.makeText(requireContext(), "Lütfen geçerli bir ödeme tutarı girin", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val maxPaymentAmount = aidat.calculatedRemainingAmount
+
+            if (paymentAmount > maxPaymentAmount) {
+                Toast.makeText(requireContext(),
+                    "Ödeme tutarı kalan borçtan fazla olamaz. Maksimum: ${numberFormat.format(maxPaymentAmount)}",
+                    Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+
+            if (!isFullPayment && paymentAmount >= maxPaymentAmount) {
+                Toast.makeText(requireContext(),
+                    "Bu tutar için tam ödeme seçmelisiniz",
+                    Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            dialog.dismiss()
+
+            // Ödeme onay dialog'u göster
+            if (isFullPayment) {
+                showFullPaymentConfirmationDialog(aidat, paymentAmount, paymentMethodText, notes)
+            } else {
+                showPartialPaymentConfirmationDialog(aidat, paymentAmount, paymentMethodText, notes)
+            }
+        }
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.show()
+    }
+
+    private fun showPartialPaymentConfirmationDialog(aidat: Aidat, amount: Double, method: String, notes: String) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_payment_confirmation, null)
+
+        val tvConfirmationTitle = dialogView.findViewById<TextView>(R.id.tvConfirmationTitle)
+        val tvConfirmationMessage = dialogView.findViewById<TextView>(R.id.tvConfirmationMessage)
+        val tvPaymentDetails = dialogView.findViewById<TextView>(R.id.tvPaymentDetails)
+        val btnConfirm = dialogView.findViewById<Button>(R.id.btnConfirm)
+        val btnCancel = dialogView.findViewById<Button>(R.id.btnCancel)
+        val btnEdit = dialogView.findViewById<Button>(R.id.btnEdit)
+
+        val numberFormat = NumberFormat.getCurrencyInstance(Locale("tr", "TR"))
+        val remaining = aidat.calculatedRemainingAmount - amount
+        val newPercentage = ((aidat.paidAmount + amount) / aidat.calculatedTotalAmount * 100).toInt()
+
+        tvConfirmationTitle.text = "⚡ Kısmi Ödeme Onayı"
+
+        tvConfirmationMessage.text = buildString {
+            append("${aidat.userName} kullanıcısı için kısmi ödeme yapmak üzeresiniz.\n\n")
+            append("⚠️ Kısmi ödeme sonrası mevcut aidat güncellenecek.")
+        }
+
+        tvPaymentDetails.text = buildString {
+            append("👤 **Sakin:** ${aidat.userName}\n")
+            append("🏠 **Daire:** ${aidat.apartmentBlock} - ${aidat.apartmentNumber}\n\n")
+
+            append("📊 **Mevcut Durum:**\n")
+            append("   💰 Toplam Borç: ${numberFormat.format(aidat.calculatedTotalAmount)}\n")
+            append("   💳 Ödenmiş: ${numberFormat.format(aidat.paidAmount)} (%${aidat.realPaymentPercentage})\n\n")
+
+            append("📈 **Yeni Ödeme:**\n")
+            append("   💵 Ödeme Tutarı: ${numberFormat.format(amount)}\n")
+            append("   📉 Yeni Kalan Borç: ${numberFormat.format(remaining)}\n")
+            append("   📊 Yeni Ödeme Oranı: %$newPercentage\n\n")
+
+            append("💳 **Ödeme Yöntemi:** $method")
+
+            if (notes.isNotEmpty()) {
+                append("\n📝 **Not:** $notes")
+            }
+        }
+
+        val dialog = AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .create()
+
+        btnConfirm.setOnClickListener {
+            dialog.dismiss()
+            processPayment(aidat, amount, method, notes, false)
+        }
+
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        btnEdit.setOnClickListener {
+            dialog.dismiss()
+            showPaymentDialog(aidat)
+        }
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.show()
+    }
+
+    private fun showFullPaymentConfirmationDialog(aidat: Aidat, amount: Double, method: String, notes: String) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_payment_confirmation, null)
+
+        val tvConfirmationTitle = dialogView.findViewById<TextView>(R.id.tvConfirmationTitle)
+        val tvConfirmationMessage = dialogView.findViewById<TextView>(R.id.tvConfirmationMessage)
+        val tvPaymentDetails = dialogView.findViewById<TextView>(R.id.tvPaymentDetails)
+        val btnConfirm = dialogView.findViewById<Button>(R.id.btnConfirm)
+        val btnCancel = dialogView.findViewById<Button>(R.id.btnCancel)
+        val btnEdit = dialogView.findViewById<Button>(R.id.btnEdit)
+
+        val numberFormat = NumberFormat.getCurrencyInstance(Locale("tr", "TR"))
+
+        tvConfirmationTitle.text = "✅ Tam Ödeme Onayı"
+
+        tvConfirmationMessage.text = buildString {
+            append("${aidat.userName} kullanıcısı için tam ödeme yapmak üzeresiniz.\n\n")
+            append("✅ Bu işlem ile aidat tamamen kapanacak ve muhasebeye aktarılacak.")
+        }
+
+        tvPaymentDetails.text = buildString {
+            append("👤 **Sakin:** ${aidat.userName}\n")
+            append("🏠 **Daire:** ${aidat.apartmentBlock} - ${aidat.apartmentNumber}\n\n")
+
+            append("💰 **Ödeme Bilgileri:**\n")
+            append("   💵 Ödeme Tutarı: ${numberFormat.format(amount)}\n")
+            append("   💳 Ödeme Yöntemi: $method\n\n")
+
+            append("📋 **Son Durum:**\n")
+            append("   ✅ Aidat tamamen ödenecek\n")
+            append("   🎉 Borç kapanacak\n")
+            append("   ✅ Muhasebeye aktarılacak")
+
+            if (notes.isNotEmpty()) {
+                append("\n📝 **Not:** $notes")
+            }
+        }
+
+        val dialog = AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .create()
+
+        btnConfirm.setOnClickListener {
+            dialog.dismiss()
+            processPayment(aidat, amount, method, notes, true)
+        }
+
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        btnEdit.setOnClickListener {
+            dialog.dismiss()
+            showPaymentDialog(aidat)
+        }
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.show()
+    }
+
+    private fun processPayment(aidat: Aidat, paymentAmount: Double, paymentMethodText: String, notes: String, isFullPayment: Boolean) {
+        val activity = requireActivity() as AdminAidatActivity
+        val userEmail = activity.fragmentUserEmail
+        val userType = activity.fragmentUserType
+
+        // Ödeme yöntemi kodunu belirle
+        val paymentMethod = when (paymentMethodText) {
+            "Nakit" -> "cash"
+            "Banka Havalesi" -> "bank_transfer"
+            "Kredi Kartı" -> "credit_card"
+            "Çek" -> "check"
+            "EFT" -> "eft"
+            else -> "other"
+        }
+
+        // Progress dialog
+        val progressDialog = AlertDialog.Builder(requireContext())
+            .setView(layoutInflater.inflate(R.layout.dialog_loading, null))
+            .setCancelable(false)
+            .create()
+        progressDialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         progressDialog.show()
 
         AidatApiService.payDue(
@@ -609,109 +745,164 @@ class AidatListesiFragment : Fragment() {
             notes = notes,
             userEmail = userEmail,
             userType = userType,
-            onSuccess = { message ->
+            onSuccess = { result: AidatApiService.PaymentResult ->
                 requireActivity().runOnUiThread {
                     progressDialog.dismiss()
-
-                    // Başarı mesajı göster
-                    showPaymentSuccessDialog(aidat, paymentAmount, paymentMethod)
-
-                    // Listeyi yenile
-                    loadAdminAidatData()
-
-                    // Seçimi temizle
-                    adapter.clearSelection()
+                    if (result.success) {
+                        showPaymentSuccessDialog(aidat, result)
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            loadAdminAidatData()
+                        }, 1500)
+                    } else {
+                        showPaymentErrorDialog("Ödeme işlemi başarısız: ${result.message}", aidat)
+                    }
                 }
             },
-            onError = { error ->
+            onError = { error: String ->
                 requireActivity().runOnUiThread {
                     progressDialog.dismiss()
-
-                    // DEBUG: Hata detayı
-                    println("❌ processPayment - Error: $error")
-
-                    // Hata mesajı göster
                     showPaymentErrorDialog(error, aidat)
                 }
             }
         )
     }
 
-    private fun showPaymentSuccessDialog(aidat: Aidat, amount: Double, method: String) {
+    private fun showPaymentSuccessDialog(aidat: Aidat, result: AidatApiService.PaymentResult) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_payment_success, null)
+
+        val tvSuccessTitle = dialogView.findViewById<TextView>(R.id.tvSuccessTitle)
+        val tvSuccessMessage = dialogView.findViewById<TextView>(R.id.tvSuccessMessage)
+        val tvPaymentDetails = dialogView.findViewById<TextView>(R.id.tvPaymentDetails)
+        val btnClose = dialogView.findViewById<Button>(R.id.btnClose)
+
         val numberFormat = NumberFormat.getCurrencyInstance(Locale("tr", "TR"))
-        val currentDate = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault()).format(Date())
 
-        val message = """
-            ✅ **ÖDEME BAŞARILI**
-            
-            👤 Sakin: ${aidat.userName}
-            💰 Ödenen Tutar: ${numberFormat.format(amount)}
-            💳 Ödeme Yöntemi: $method
-            📅 Tarih: $currentDate
-            
-            Fiş No: ${System.currentTimeMillis().toString().takeLast(8)}
-            
-            Aidat durumu güncellendi.
-        """.trimIndent()
+        val isPartial = result.payment_type == "partial"
 
-        AlertDialog.Builder(requireContext())
-            .setTitle("Ödeme Tamamlandı")
-            .setMessage(message)
-            .setPositiveButton("Tamam") { dialog, _ ->
-                dialog.dismiss()
+        tvSuccessTitle.text = if (isPartial) "⚡ Kısmi Ödeme Başarılı" else "✅ Ödeme Tamamlandı"
+
+        tvSuccessMessage.text = if (isPartial) {
+            "Kısmi ödeme başarıyla kaydedildi. Kalan borç güncellendi."
+        } else {
+            "Ödeme başarıyla tamamlandı. Aidat kapatıldı ve muhasebeye aktarıldı."
+        }
+
+        tvPaymentDetails.text = buildString {
+            append("👤 **Sakin:** ${aidat.userName}\n")
+            append("🏠 **Daire:** ${aidat.apartmentBlock} - ${aidat.apartmentNumber}\n\n")
+
+            append("💰 **Ödeme Bilgileri:**\n")
+            append("   💵 Ödeme Tutarı: ${numberFormat.format(result.payment_amount)}\n")
+            append("   🧾 Fiş No: ${result.receipt_number}\n")
+
+            if (!result.transaction_id.isNullOrEmpty()) {
+                append("   🔢 İşlem No: ${result.transaction_id}\n")
             }
-            .setNeutralButton("Fiş Yazdır") { dialog, _ ->
-                Toast.makeText(requireContext(), "Fiş yazdırma işlemi başlatıldı", Toast.LENGTH_SHORT).show()
-                dialog.dismiss()
+
+            if (isPartial) {
+                append("\n📊 **Yeni Durum:**\n")
+                append("   📋 Toplam Ödenen: ${numberFormat.format(result.paid_amount)}\n")
+                append("   🔄 Kalan Borç: ${numberFormat.format(result.remaining_amount)}\n")
             }
-            .show()
+        }
+
+        val dialog = AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .create()
+
+        btnClose.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.show()
     }
 
     private fun showPaymentErrorDialog(error: String, aidat: Aidat) {
-        val message = """
-            ❌ **ÖDEME HATASI**
-            
-            Hata: $error
-            
-            Lütfen:
-            1. İnternet bağlantınızı kontrol edin
-            2. Bilgilerin doğruluğunu kontrol edin
-            3. Daha sonra tekrar deneyin
-        """.trimIndent()
+        val dialogView = layoutInflater.inflate(R.layout.dialog_payment_error, null)
 
-        AlertDialog.Builder(requireContext())
-            .setTitle("Ödeme Hatası")
-            .setMessage(message)
-            .setPositiveButton("Tekrar Dene") { dialog, _ ->
-                dialog.dismiss()
-                showPaymentDialog(aidat)
-            }
-            .setNegativeButton("İptal") { dialog, _ ->
-                dialog.dismiss()
-            }
-            .show()
+        val tvErrorTitle = dialogView.findViewById<TextView>(R.id.tvErrorTitle)
+        val tvErrorMessage = dialogView.findViewById<TextView>(R.id.tvErrorMessage)
+        val btnRetry = dialogView.findViewById<Button>(R.id.btnRetry)
+        val btnCancel = dialogView.findViewById<Button>(R.id.btnCancel)
+
+        tvErrorTitle.text = "❌ Ödeme Hatası"
+        tvErrorMessage.text = buildString {
+            append("Ödeme işlemi sırasında bir hata oluştu:\n\n")
+            append("**Hata:** $error\n\n")
+            append("Lütfen:\n")
+            append("1. İnternet bağlantınızı kontrol edin\n")
+            append("2. Bilgilerin doğruluğunu kontrol edin\n")
+            append("3. Sunucu bağlantısını kontrol edin\n")
+            append("4. Daha sonra tekrar deneyin")
+        }
+
+        val dialog = AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .create()
+
+        btnRetry.setOnClickListener {
+            dialog.dismiss()
+            showPaymentDialog(aidat)
+        }
+
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.show()
     }
 
     // Yardımcı fonksiyonlar
-    private fun formatDate(dateString: String): String {
+    private fun formatDate(dateString: String?): String {
+        if (dateString.isNullOrEmpty()) return "-"
         return try {
             val parts = dateString.split("-")
-            if (parts.size == 3) {
-                "${parts[2]}.${parts[1]}.${parts[0]}"
-            } else {
-                dateString
-            }
+            if (parts.size == 3) "${parts[2]}.${parts[1]}.${parts[0]}" else dateString
         } catch (e: Exception) {
             dateString
         }
     }
 
-    private fun getStatusText(status: String): String {
-        return when (status.lowercase()) {
-            "paid" -> "Ödendi"
-            "pending" -> "Bekliyor"
-            "overdue" -> "Gecikmiş"
-            else -> status
+    // Payment History Adapter
+    private inner class PaymentHistoryAdapter(private val payments: List<AidatApiService.PaymentHistory>) : BaseAdapter() {
+        override fun getCount(): Int = payments.size
+        override fun getItem(position: Int): AidatApiService.PaymentHistory = payments[position]
+        override fun getItemId(position: Int): Long = position.toLong()
+
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+            val view = convertView ?: layoutInflater.inflate(R.layout.item_payment_history, parent, false)
+            val payment = getItem(position)
+
+            val tvPaymentNumber = view.findViewById<TextView>(R.id.tvPaymentNumber)
+            val tvPaymentAmount = view.findViewById<TextView>(R.id.tvPaymentAmount)
+            val tvPaymentDate = view.findViewById<TextView>(R.id.tvPaymentDate)
+            val tvPaymentMethod = view.findViewById<TextView>(R.id.tvPaymentMethod)
+            val tvPaymentType = view.findViewById<TextView>(R.id.tvPaymentType)
+            val tvReceiptNumber = view.findViewById<TextView>(R.id.tvReceiptNumber)
+
+            val numberFormat = NumberFormat.getCurrencyInstance(Locale("tr", "TR"))
+
+            tvPaymentNumber.text = "#${position + 1}"
+            tvPaymentAmount.text = numberFormat.format(payment.payment_amount)
+            tvPaymentDate.text = formatDate(payment.payment_date)
+
+            // Ödeme yöntemi görselleştirme
+            val methodText = when (payment.payment_method) {
+                "cash" -> "Nakit"
+                "bank_transfer" -> "Banka Havalesi"
+                "credit_card" -> "Kredi Kartı"
+                "check" -> "Çek"
+                "eft" -> "EFT"
+                else -> payment.payment_method
+            }
+            tvPaymentMethod.text = methodText
+
+            tvPaymentType.text = if (payment.is_partial == 1) "Kısmi" else "Tam"
+            tvReceiptNumber.text = payment.receipt_number
+
+            return view
         }
     }
 }

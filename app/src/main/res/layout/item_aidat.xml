@@ -1,62 +1,172 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:background="@android:color/white"
     android:layout_margin="8dp"
-    android:elevation="2dp">
-    <TextView
-        android:id="@+id/tvKullanici"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp">
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Kullanıcı: Ahmet Yılmaz (ahmet@example.com)"
-        android:textSize="12sp"
-        android:textColor="#666"
-        android:layout_marginTop="4dp"
-        android:visibility="gone" />
-    <!-- Ay Bilgisi -->
-    <TextView
-        android:id="@+id/tvTarih"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Ocak 2024"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textColor="#2c3e50" />
+        android:orientation="vertical"
+        android:padding="12dp">
 
-    <!-- Tutar -->
-    <TextView
-        android:id="@+id/tvTutar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="₺500,00"
-        android:textSize="16sp"
-        android:textColor="#34495e"
-        android:layout_marginTop="4dp" />
+        <!-- Site Bilgisi - YENİ -->
+        <TextView
+            android:id="@+id/tvSiteInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Site 1"
+            android:textSize="12sp"
+            android:textColor="@color/blue"
+            android:background="@drawable/badge_background"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="2dp"
+            android:layout_marginBottom="4dp"
+            android:visibility="gone" />
 
-    <!-- Son Tarih -->
-    <TextView
-        android:id="@+id/tvSonTarih"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Son Tarih: 25 Ocak 2024"
-        android:textSize="12sp"
-        android:textColor="#7f8c8d"
-        android:layout_marginTop="4dp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-    <!-- Durum -->
-    <TextView
-        android:id="@+id/tvDurum"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="ÖDENDİ"
-        android:textSize="12sp"
-        android:textColor="@android:color/white"
-        android:paddingHorizontal="12dp"
-        android:paddingVertical="4dp"
-        android:layout_marginTop="8dp"
-        android:background="#2ecc71" />
+            <!-- Sol Taraf -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-</LinearLayout>
+                <!-- Kullanıcı Bilgisi (Admin için) -->
+                <TextView
+                    android:id="@+id/tvKullanici"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="@color/gray"
+                    android:visibility="gone" />
+
+                <!-- Tarih/Ay -->
+                <TextView
+                    android:id="@+id/tvTarih"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/black" />
+
+                <!-- Tutar -->
+                <TextView
+                    android:id="@+id/tvTutar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:textColor="@color/blue_dark"
+                    android:layout_marginTop="2dp" />
+
+                <!-- Son Tarih -->
+                <TextView
+                    android:id="@+id/tvSonTarih"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="@color/gray"
+                    android:layout_marginTop="2dp" />
+
+            </LinearLayout>
+
+            <!-- Sağ Taraf (Durum) -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="end">
+
+                <!-- Durum -->
+                <TextView
+                    android:id="@+id/tvDurum"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="4dp"
+                    android:textSize="12sp"
+                    android:textColor="@color/white"
+                    android:textStyle="bold" />
+
+                <!-- ÖDEME YAP BUTONU - YENİ -->
+                <TextView
+                    android:id="@+id/btnOdemeYap"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="6dp"
+                    android:text="Ödeme Yap"
+                    android:textSize="12sp"
+                    android:textColor="@color/white"
+                    android:background="@drawable/button_odeme_background"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Ödeme Bilgileri (Kısmi/Gecikme) -->
+        <LinearLayout
+            android:id="@+id/layoutPaymentInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="8dp"
+            android:padding="8dp"
+            android:background="@color/light_gray"
+            android:visibility="gone">
+
+            <!-- Kalan Borç -->
+            <TextView
+                android:id="@+id/tvKalanBorc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="2dp" />
+
+            <!-- Ödenen Miktar -->
+            <TextView
+                android:id="@+id/tvOdenenMiktar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:layout_marginBottom="2dp" />
+
+            <!-- Ödeme Yüzdesi -->
+            <TextView
+                android:id="@+id/tvPaymentStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:layout_marginBottom="2dp" />
+
+            <!-- Gecikme Cezası -->
+            <TextView
+                android:id="@+id/tvLateFee"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:layout_marginBottom="2dp" />
+
+            <!-- Ödeme Tarihi -->
+            <TextView
+                android:id="@+id/tvPaymentDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

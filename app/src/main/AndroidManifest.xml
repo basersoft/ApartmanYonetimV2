@@ -12,7 +12,47 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+       <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.READ_CALL_LOG" />
+    <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS" />
+    <!-- Telefon yönetimi için ek izinler -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
 
+    <!-- Sistem uyarısı göstermek için (opsiyonel) -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
+    <!-- Telefon uygulamasını özelleştirmek için -->
+    <uses-permission android:name="android.permission.READ_CALL_LOG" />
+    <uses-permission android:name="android.permission.WRITE_CALL_LOG" />
+    <!-- Uyku modu (Doze) için -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+    <!-- Android 11 için ek izinler -->
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <!-- Telefon yönetimi -->
+    <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <!-- Namaz Vakitleri için izinler -->
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- Konum izinleri -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <!-- Google Play Services -->
+    <meta-data
+        android:name="com.google.android.gms.version"
+        android:value="@integer/google_play_services_version" />
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
@@ -84,6 +124,7 @@
             android:name=".SharedExpensesActivity"
             android:label="Toplu Harcamalar"
             android:parentActivityName=".DashboardActivity"
+            android:theme="@style/Theme.MaterialComponents.Light.DarkActionBar"
             android:exported="false" />
 
         <activity
@@ -109,6 +150,53 @@
             android:label="Hava Durumu"
             android:parentActivityName=".MainActivity"
             android:exported="false" />
+        <activity
+            android:name=".ButonDurumActivity"
+            android:label="Buton Durum"
+            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar" />
+        <activity
+            android:name=".KombiActivity"
+            android:label="Kombi Kontrol"
+            android:parentActivityName=".DashboardActivity"
+            android:exported="false" />
+        <activity
+            android:name=".KombiSettingsActivity"
+            android:label="Kombi Ayarları"
+            android:parentActivityName=".KombiActivity"
+            android:exported="false" />
+        <activity
+            android:name=".EspSettingsActivity"
+            android:label="ESP Ayarlar"
+            android:theme="@style/Theme.Apartman.NoActionBar" />
+        <activity android:name=".ForgotPasswordActivity" />
+        <activity android:name=".ResetPasswordActivity" />
+        <activity android:name=".RegisterActivity" />
+        <activity
+            android:name=".MessagesActivity"
+            android:label="Mesajlar"
+            android:theme="@style/Theme.Apartman.NoActionBar" />
+        <activity
+            android:name=".OdemeDialogActivity"
+            android:theme="@style/Theme.AppCompat.Light.Dialog"
+            android:windowSoftInputMode="adjustResize" />
+        <!-- Uyku Modu Aktivitesi -->
+        <activity
+            android:name=".UykuModuActivity"
+            android:label="Uyku Modu"
+            android:parentActivityName=".DashboardActivity"
+            android:exported="false" />
+        <!-- Rahatsız Etme Modu Aktivitesi -->
+        <activity
+            android:name=".RahatsizEtmeModuActivity"
+            android:label="Rahatsız Etme Modu"
+            android:parentActivityName=".DashboardActivity"
+            android:exported="false" />
+
+        <!-- Rahatsız Etme Servisi -->
+        <service
+            android:name=".RahatsizEtmeServisi"
+            android:enabled="true"
+            android:exported="false" />
 
         <!-- Servisler -->
         <service android:name=".NotificationService" />
@@ -128,10 +216,38 @@
             android:name=".GarajService"
             android:enabled="true"
             android:exported="false" />
-
+        <service
+            android:name=".service.CagiYanitlaServisi"
+            android:enabled="true"
+            android:exported="false" />
+        <!-- Namaz Vakitleri Servisi ve Receiver -->
+        <service
+            android:name=".NamazVaktiServisi"
+            android:enabled="true"
+            android:exported="false" />
+        <!-- Namaz Vakitleri Receiver -->
+        <receiver
+            android:name=".NamazVaktiReceiver"
+            android:enabled="true"
+            android:exported="false" />
+        <receiver
+            android:name=".NamazVaktiReceiver"
+            android:enabled="true"
+            android:exported="false" />
+        <service
+            android:name=".GeriSayimServisi"
+            android:enabled="true"
+            android:exported="false" />
+        <!-- Namaz Vakitleri Activity -->
+        <activity
+            android:name=".NamazVakitleriActivity"
+            android:label="Namaz Vakitleri"
+            android:parentActivityName=".DashboardActivity"
+            android:exported="false" />
         <!-- WEATHER WIDGET -->
         <receiver
             android:name=".weather.WeatherAppWidget"
+            android:label="Hava Durum"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -141,10 +257,22 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/weather_widget_info" />
         </receiver>
-
+        <receiver
+            android:name=".widgets.UykuModuWidget"
+            android:label="Uyku Modu"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.baser.apartman.TOGGLE_UYKU_MODU" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_uyku_modu_info" />
+        </receiver>
         <!-- Aidat Widget -->
         <receiver
             android:name=".widgets.AidatAppWidget"
+            android:label="Aidat Durum"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -158,6 +286,7 @@
         <!-- Duyuru Widget -->
         <receiver
             android:name=".widgets.DuyuruAppWidget"
+            android:label="Duyuru"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -169,6 +298,7 @@
         </receiver>
         <receiver
             android:name=".widgets.GarajWidget"
+            android:label="Garaj Aç"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -181,6 +311,13 @@
         <service
             android:name=".widgets.GarajAcaService"
             android:exported="false" />
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+
+        </provider>
     </application>
 
 </manifest>

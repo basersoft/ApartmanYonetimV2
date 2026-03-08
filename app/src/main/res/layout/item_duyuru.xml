@@ -7,6 +7,16 @@
     android:background="@android:color/white"
     android:layout_margin="8dp">
 
+    <!-- Resim Görünümü -->
+    <ImageView
+        android:id="@+id/ivResim"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_marginBottom="12dp"
+        android:scaleType="centerCrop"
+        android:visibility="gone"
+        android:contentDescription="Duyuru resmi" />
+
     <TextView
         android:id="@+id/tvBaslik"
         android:layout_width="match_parent"
@@ -33,5 +43,17 @@
         android:textSize="12sp"
         android:textColor="#7f8c8d"
         android:layout_marginTop="8dp" />
+
+    <Button
+        android:id="@+id/btnSetSplash"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="📱 Splash'e Ekle"
+        android:backgroundTint="#4361ee"
+        android:textColor="#FFFFFF"
+        android:layout_marginTop="12dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:visibility="gone" />
 
 </LinearLayout>

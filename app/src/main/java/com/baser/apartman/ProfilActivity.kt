@@ -13,16 +13,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.drawerlayout.widget.DrawerLayout
-import com.android.volley.Request
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.navigation.NavigationView
-import java.net.HttpURLConnection
-import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.HashMap
 
 class ProfilActivity : BaseActivity() {
 
@@ -43,17 +37,24 @@ class ProfilActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profil)
+
         // ApiManager'ı başlat
         ApiManager.initialize(this)
 
-        setupNavigation()
+        // Önce BaseActivity'deki setupNavigation'ı çağır
+        super.setupNavigation()
+
+        // Sonra kendi toolbar ayarlarımızı yap
+        setupToolbar()
+
+        // View'ları bağla
         setupViews()
+
+        // Kullanıcı profilini yükle
         loadUserProfile()
     }
 
-    // Artık override edebiliriz çünkü BaseActivity'de open yaptık
-    override fun setupNavigation() {
-        val navigationView = findViewById<NavigationView>(R.id.navigation_view)
+    private fun setupToolbar() {
         val drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
         val toolbar = findViewById<MaterialToolbar>(R.id.toolbar)
 
@@ -64,13 +65,9 @@ class ProfilActivity : BaseActivity() {
 
         // Toolbar'ı ayarla
         setSupportActionBar(toolbar)
+        supportActionBar?.title = "Profilim"
 
-        // HAMBURGER İKONU İÇİN ÖNEMLİ: Display options'ı sıfırla
-        supportActionBar?.setDisplayHomeAsUpEnabled(false) // Önce kapat
-        supportActionBar?.setDisplayShowHomeEnabled(true)
-        supportActionBar?.setHomeButtonEnabled(true)
-
-        // ActionBarDrawerToggle oluştur - HAMBURGER İÇİN
+        // Hamburger ikonu için ActionBarDrawerToggle oluştur
         val toggle = ActionBarDrawerToggle(
             this,
             drawerLayout,
@@ -80,29 +77,14 @@ class ProfilActivity : BaseActivity() {
         )
 
         drawerLayout.addDrawerListener(toggle)
-        toggle.syncState() // BU ÇOK ÖNEMLİ!
+        toggle.syncState()
 
-        // Hamburger ikonunu zorla göster
+        // Hamburger ikonunu beyaz yap
         toggle.drawerArrowDrawable.color = resources.getColor(android.R.color.white, null)
 
-        // Başlık ayarla
-        supportActionBar?.title = "Profilim"
-
-        println("✅ Hamburger ikonu ayarlandı")
-
-        // Navigation listener
-        navigationView?.setNavigationItemSelectedListener(this)
-
-        // Header bilgilerini güncelle
-        val headerView = navigationView?.getHeaderView(0)
-        headerView?.let {
-            val tvUserName = it.findViewById<TextView>(R.id.tvUserName)
-            val tvUserEmail = it.findViewById<TextView>(R.id.tvUserEmail)
-
-            tvUserName.text = userName
-            tvUserEmail.text = userEmail
-        }
+        println("✅ ProfilActivity: Toolbar ayarlandı")
     }
+
     private fun setupViews() {
         ivProfilResmi = findViewById(R.id.ivProfilResmi)
         tvAdSoyad = findViewById(R.id.tvAdSoyad)
@@ -122,11 +104,10 @@ class ProfilActivity : BaseActivity() {
         tvAdSoyad.text = userName
         tvEmail.text = userEmail
 
-        // Varsayılan profil resmini yükle
-        loadDefaultProfileImage()
+        // SADECE ProfileImageManager kullan
+        ProfileImageManager.loadProfileImage(this, userEmail, ivProfilResmi)
     }
 
-    // ... diğer metodlar (loadUserProfile, parseUserProfile, vb.) aynı kalacak
     private fun loadUserProfile() {
         val sqlQuery = "SELECT * FROM apartman_users WHERE email = '$userEmail'"
 
@@ -142,6 +123,7 @@ class ProfilActivity : BaseActivity() {
             }
         )
     }
+
     private fun parseUserProfile(csvResponse: String) {
         try {
             println("🔍 CSV Yanıtı işleniyor...")
@@ -153,9 +135,6 @@ class ProfilActivity : BaseActivity() {
                 val headers = lines[0].split(",")
                 val userData = lines[1].split(",")
 
-                println("🔍 Başlıklar: $headers")
-                println("🔍 Veriler: $userData")
-
                 // CSV'den verileri al
                 val userMap = mutableMapOf<String, String>()
                 for (i in headers.indices) {
@@ -166,9 +145,9 @@ class ProfilActivity : BaseActivity() {
 
                 println("🔍 User Map: $userMap")
 
-                // PROFİL RESMİ DEBUG
+                // Profil resmi URL'sini al
                 val profileImage = userMap["profile_image"]
-                println("🔍 Profil Resmi Alanı: $profileImage")
+                println("🔍 Profil Resmi URL: $profileImage")
 
                 // UI'ı güncelle
                 runOnUiThread {
@@ -227,8 +206,8 @@ class ProfilActivity : BaseActivity() {
                     // Formatlı tarih
                     tvTarihFormatli.text = formatDate(kayitTarihi)
 
-                    // Profil resmini yükle
-                    loadProfileImageSimple(profileImage)
+                    // ProfileImageManager ile resmi yükle (yeniden yükleme yapmaz, sadece cache'te yoksa yükler)
+                    ProfileImageManager.loadProfileImage(this@ProfilActivity, userEmail, ivProfilResmi)
 
                     Toast.makeText(this, "Profil bilgileri güncellendi", Toast.LENGTH_SHORT).show()
                 }
@@ -242,72 +221,6 @@ class ProfilActivity : BaseActivity() {
             println("❌ Profil ayrıştırma hatası: ${e.message}")
             e.printStackTrace()
             showDefaultProfile()
-        }
-    }
-
-    // BASİT RESİM YÜKLEME FONKSİYONU
-    private fun loadProfileImageSimple(imageUrl: String?) {
-        try {
-            if (!imageUrl.isNullOrEmpty() && imageUrl != "null") {
-                println("🔍 Basit resim yükleme: $imageUrl")
-
-                val fullImageUrl = "http://baser.org/apartman/uploads/profile_images/$imageUrl"
-                println("🔍 Tam resim URL: $fullImageUrl")
-
-                Thread {
-                    try {
-                        val url = URL(fullImageUrl)
-                        val connection = url.openConnection() as HttpURLConnection
-                        connection.doInput = true
-                        connection.connectTimeout = 20000 // 20 saniye
-                        connection.readTimeout = 20000 // 20 saniye
-                        connection.connect()
-
-                        val inputStream = connection.inputStream
-
-                        // Direkt küçük boyutta decode et
-                        val options = BitmapFactory.Options().apply {
-                            inSampleSize = 4 // 1/4 boyutunda
-                            inPreferredConfig = Bitmap.Config.RGB_565
-                        }
-
-                        val bitmap = BitmapFactory.decodeStream(inputStream, null, options)
-                        inputStream.close()
-                        connection.disconnect()
-
-                        runOnUiThread {
-                            if (bitmap != null) {
-                                // Daha da küçült
-                                val finalBitmap = if (bitmap.width > 400 || bitmap.height > 400) {
-                                    val scaleFactor = minOf(400f / bitmap.width, 400f / bitmap.height)
-                                    val newWidth = (bitmap.width * scaleFactor).toInt()
-                                    val newHeight = (bitmap.height * scaleFactor).toInt()
-                                    Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true)
-                                } else {
-                                    bitmap
-                                }
-
-                                val roundedBitmap = getRoundedBitmap(finalBitmap)
-                                ivProfilResmi.setImageBitmap(roundedBitmap)
-                                ivProfilResmi.background = resources.getDrawable(R.drawable.circle_background, null)
-                                println("✅ Basit yükleme başarılı: ${finalBitmap.width}x${finalBitmap.height}")
-                            } else {
-                                loadDefaultProfileImage()
-                            }
-                        }
-                    } catch (e: Exception) {
-                        println("❌ Basit resim yükleme hatası: ${e.message}")
-                        runOnUiThread {
-                            loadDefaultProfileImage()
-                        }
-                    }
-                }.start()
-            } else {
-                loadDefaultProfileImage()
-            }
-        } catch (e: Exception) {
-            println("❌ Resim yükleme hatası: ${e.message}")
-            loadDefaultProfileImage()
         }
     }
 
@@ -330,7 +243,6 @@ class ProfilActivity : BaseActivity() {
     private fun loadDefaultProfileImage() {
         runOnUiThread {
             ivProfilResmi.setImageResource(R.drawable.ic_profile_placeholder)
-            // Yuvarlak arkaplan ekle
             ivProfilResmi.background = resources.getDrawable(R.drawable.circle_background, null)
         }
     }
@@ -338,7 +250,6 @@ class ProfilActivity : BaseActivity() {
     private fun formatDate(dateString: String): String {
         return try {
             if (dateString.isNotEmpty()) {
-                // MySQL timestamp formatını Türkçe tarihe çevir
                 val inputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
                 val outputFormat = SimpleDateFormat("dd MMMM yyyy HH:mm", Locale("tr", "TR"))
                 val date = inputFormat.parse(dateString)
@@ -374,15 +285,11 @@ class ProfilActivity : BaseActivity() {
             tvHatirlatici.text = "Bulunamadı"
 
             loadDefaultProfileImage()
-
-            Toast.makeText(this, "Varsayılan profil gösteriliyor", Toast.LENGTH_SHORT).show()
         }
     }
 
-    // Memory optimizasyonu
     override fun onDestroy() {
         super.onDestroy()
-        // Bitmap'leri temizle (memory leak önleme)
         ivProfilResmi.setImageBitmap(null)
     }
 

@@ -6,549 +6,561 @@
     android:layout_height="match_parent">
 
     <!-- Ana içerik -->
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <!-- Toolbar (Menü butonu için) -->
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
+        <!-- ARKA PLAN RESMİ (EN ALTTA) -->
+        <ImageView
+            android:id="@+id/backgroundImage"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="#4361ee"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            app:title="Dashboard" />
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/placeholder_background" />
 
-        <!-- Ana içerik -->
-        <ScrollView
+        <!-- ANA İÇERİK KONTEYNERİ (Arka planın üzerinde) -->
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:padding="16dp"
-            android:background="#f5f7fa"
-            android:fillViewport="true">
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:background="#f5f7faaa"> <!-- %66 şeffaflık -->
 
+            <!-- Toolbar (Menü butonu için) -->
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="#4361ee"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                app:title="Dashboard" />
+
+            <!-- Ana içerik -->
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:padding="16dp"
+                android:fillViewport="true"
+                android:background="@android:color/transparent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Hoşgeldiniz Başlığı -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="4dp"
+                        app:cardBackgroundColor="@color/white">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="20dp">
+
+                            <TextView
+                                android:id="@+id/tvWelcome"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Hoşgeldiniz"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:textColor="#4361ee" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Gerçek zamanlı kontrol paneli"
+                                android:textSize="14sp"
+                                android:textColor="#808080"
+                                android:layout_marginTop="4dp" />
+
+                        </LinearLayout>
+
+                    </androidx.cardview.widget.CardView>
+
+                    <!-- Yükleme Göstergesi -->
+                    <ProgressBar
+                        android:id="@+id/loadingIndicator"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginBottom="16dp" />
+
+                    <!-- İstatistik Kartları - 1. Satır -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="8dp">
+
+                        <!-- Toplam Sakinler -->
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="0dp"
+                            android:layout_height="140dp"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="8dp"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="4dp"
+                            android:backgroundTint="#2c3e50">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical"
+                                android:padding="16dp"
+                                android:gravity="center">
+
+                                <ImageView
+                                    android:layout_width="35dp"
+                                    android:layout_height="35dp"
+                                    android:src="@drawable/ic_users"
+                                    android:tint="@color/white" />
+
+                                <TextView
+                                    android:id="@+id/tvTotalUsers"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0"
+                                    android:textSize="22sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/white"
+                                    android:layout_marginTop="12dp"
+                                    android:includeFontPadding="false"
+                                    android:lineSpacingExtra="0sp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Toplam Sakin"
+                                    android:textSize="11sp"
+                                    android:textColor="@color/white"
+                                    android:layout_marginTop="4px"
+                                    android:includeFontPadding="false" />
+
+                            </LinearLayout>
+
+                        </androidx.cardview.widget.CardView>
+
+                        <!-- Toplam Aidatlar -->
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="0dp"
+                            android:layout_height="140dp"
+                            android:layout_weight="1"
+                            android:layout_marginStart="8dp"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="4dp"
+                            android:backgroundTint="#27ae60">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical"
+                                android:padding="16dp"
+                                android:gravity="center">
+
+                                <ImageView
+                                    android:layout_width="35dp"
+                                    android:layout_height="35dp"
+                                    android:src="@drawable/ic_receipt"
+                                    android:tint="@color/white" />
+
+                                <TextView
+                                    android:id="@+id/tvTotalDues"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0"
+                                    android:textSize="22sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/white"
+                                    android:layout_marginTop="12dp"
+                                    android:includeFontPadding="false"
+                                    android:lineSpacingExtra="0sp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Toplam Aidat"
+                                    android:textSize="11sp"
+                                    android:textColor="@color/white"
+                                    android:layout_marginTop="4px"
+                                    android:includeFontPadding="false" />
+
+                            </LinearLayout>
+
+                        </androidx.cardview.widget.CardView>
+
+                    </LinearLayout>
+
+                    <!-- İstatistik Kartları - 2. Satır -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="8dp">
+
+                        <!-- Bekleyen Şikayetler -->
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="0dp"
+                            android:layout_height="140dp"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="8dp"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="4dp"
+                            android:backgroundTint="#f39c12">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical"
+                                android:padding="16dp"
+                                android:gravity="center">
+
+                                <ImageView
+                                    android:layout_width="35dp"
+                                    android:layout_height="35dp"
+                                    android:src="@drawable/ic_warning"
+                                    android:tint="@color/white" />
+
+                                <TextView
+                                    android:id="@+id/tvPendingComplaints"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0"
+                                    android:textSize="22sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/white"
+                                    android:layout_marginTop="12dp"
+                                    android:includeFontPadding="false"
+                                    android:lineSpacingExtra="0sp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Bekleyen Şikayet"
+                                    android:textSize="11sp"
+                                    android:textColor="@color/white"
+                                    android:layout_marginTop="4px"
+                                    android:includeFontPadding="false" />
+
+                            </LinearLayout>
+
+                        </androidx.cardview.widget.CardView>
+
+                        <!-- Toplam Duyurular -->
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="0dp"
+                            android:layout_height="140dp"
+                            android:layout_weight="1"
+                            android:layout_marginStart="8dp"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="4dp"
+                            android:backgroundTint="#3498db">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical"
+                                android:padding="16dp"
+                                android:gravity="center">
+
+                                <ImageView
+                                    android:layout_width="35dp"
+                                    android:layout_height="35dp"
+                                    android:src="@drawable/ic_announcement"
+                                    android:tint="@color/white" />
+
+                                <TextView
+                                    android:id="@+id/tvTotalAnnouncements"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0"
+                                    android:textSize="22sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/white"
+                                    android:layout_marginTop="12dp"
+                                    android:includeFontPadding="false"
+                                    android:lineSpacingExtra="0sp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Toplam Duyuru"
+                                    android:textSize="11sp"
+                                    android:textColor="@color/white"
+                                    android:layout_marginTop="4px"
+                                    android:includeFontPadding="false" />
+
+                            </LinearLayout>
+
+                        </androidx.cardview.widget.CardView>
+
+                    </LinearLayout>
+
+                    <!-- Gecikme İstatistikleri -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="16dp">
+
+                        <!-- Gecikmiş Aidatlar -->
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="0dp"
+                            android:layout_height="100dp"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="8dp"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="4dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical"
+                                android:padding="12dp"
+                                android:gravity="center">
+
+                                <TextView
+                                    android:id="@+id/tvOverdueDues"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0"
+                                    android:textSize="18sp"
+                                    android:textStyle="bold"
+                                    android:textColor="#e74c3c"
+                                    android:includeFontPadding="false" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Gecikmiş Aidat"
+                                    android:textSize="10sp"
+                                    android:textColor="#808080"
+                                    android:gravity="center"
+                                    android:layout_marginTop="4px"
+                                    android:includeFontPadding="false" />
+
+                            </LinearLayout>
+
+                        </androidx.cardview.widget.CardView>
+
+                        <!-- Toplam Gecikme Ücreti -->
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="0dp"
+                            android:layout_height="100dp"
+                            android:layout_weight="1"
+                            android:layout_marginStart="8dp"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="4dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical"
+                                android:padding="12dp"
+                                android:gravity="center">
+
+                                <TextView
+                                    android:id="@+id/tvTotalLateFees"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="₺0.00"
+                                    android:textSize="18sp"
+                                    android:textStyle="bold"
+                                    android:textColor="#e74c3c"
+                                    android:includeFontPadding="false" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Gecikme Ücreti"
+                                    android:textSize="10sp"
+                                    android:textColor="#808080"
+                                    android:gravity="center"
+                                    android:layout_marginTop="4px"
+                                    android:includeFontPadding="false" />
+
+                            </LinearLayout>
+
+                        </androidx.cardview.widget.CardView>
+
+                    </LinearLayout>
+
+                    <!-- Hızlı Erişim Butonları -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="4dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Hızlı Erişim"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:layout_marginBottom="12dp" />
+
+                            <!-- 1. Satır Butonları -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:layout_marginBottom="8dp">
+
+                                <Button
+                                    android:id="@+id/btnAidat"
+                                    android:layout_width="0dp"
+                                    android:layout_height="100dp"
+                                    android:layout_weight="1"
+                                    android:layout_marginEnd="8dp"
+                                    android:text="Aidatlar"
+                                    android:textColor="@color/white"
+                                    android:backgroundTint="#27ae60"
+                                    android:textSize="14sp" />
+
+                                <Button
+                                    android:id="@+id/btnDuyurular"
+                                    android:layout_width="0dp"
+                                    android:layout_height="100dp"
+                                    android:layout_weight="1"
+                                    android:layout_marginStart="8dp"
+                                    android:text="Duyurular"
+                                    android:textColor="@color/white"
+                                    android:backgroundTint="#3498db"
+                                    android:textSize="14sp" />
+
+                            </LinearLayout>
+
+                            <!-- 2. Satır Butonları -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:layout_marginBottom="8dp">
+
+                                <Button
+                                    android:id="@+id/btnBakim"
+                                    android:layout_width="0dp"
+                                    android:layout_height="100dp"
+                                    android:layout_weight="1"
+                                    android:layout_marginEnd="8dp"
+                                    android:text="Garaj"
+                                    android:textColor="@color/white"
+                                    android:backgroundTint="#f39c12"
+                                    android:textSize="14sp" />
+
+                                <Button
+                                    android:id="@+id/btnSikayetler"
+                                    android:layout_width="0dp"
+                                    android:layout_height="100dp"
+                                    android:layout_weight="1"
+                                    android:layout_marginStart="8dp"
+                                    android:text="Şikayetler"
+                                    android:textColor="@color/white"
+                                    android:backgroundTint="#e74c3c"
+                                    android:textSize="14sp" />
+
+                            </LinearLayout>
+
+                            <!-- GARAJ AÇ BUTONU -->
+                            <Button
+                                android:id="@+id/btnGarajAc"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="GARAJ AÇ"
+                                android:background="@drawable/btn_garaj_ripple"
+                                android:textColor="#FFFFFF"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:layout_marginTop="8dp"
+                                android:padding="16dp"
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:clickable="true"
+                                android:focusable="true"/>
+
+                        </LinearLayout>
+
+                    </androidx.cardview.widget.CardView>
+
+                    <!-- Yenile Butonu -->
+                    <Button
+                        android:id="@+id/btnRefresh"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="Verileri Yenile"
+                        android:textColor="@color/white"
+                        android:backgroundTint="#4361ee"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+            </ScrollView>
+
+            <!-- Basit Bottom Navigation -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="horizontal"
+                android:background="#4361ee"
+                android:padding="8dp">
 
-                <!-- Hoşgeldiniz Başlığı -->
-                <androidx.cardview.widget.CardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="4dp"
-                    app:cardBackgroundColor="@color/white">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="20dp">
-
-                        <TextView
-                            android:id="@+id/tvWelcome"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Hoşgeldiniz"
-                            android:textSize="20sp"
-                            android:textStyle="bold"
-                            android:textColor="#4361ee" />
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Gerçek zamanlı kontrol paneli"
-                            android:textSize="14sp"
-                            android:textColor="#808080"
-                            android:layout_marginTop="4dp" />
-
-                    </LinearLayout>
-
-                </androidx.cardview.widget.CardView>
-
-                <!-- Yükleme Göstergesi -->
-                <ProgressBar
-                    android:id="@+id/loadingIndicator"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginBottom="16dp" />
-
-                <!-- İstatistik Kartları - 1. Satır -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="8dp">
-
-                    <!-- Toplam Sakinler -->
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="0dp"
-                        android:layout_height="140dp"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="8dp"
-                        app:cardCornerRadius="12dp"
-                        app:cardElevation="4dp"
-                        android:backgroundTint="#2c3e50">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical"
-                            android:padding="16dp"
-                            android:gravity="center">
-
-                            <ImageView
-                                android:layout_width="35dp"
-                                android:layout_height="35dp"
-                                android:src="@drawable/ic_users"
-                                android:tint="@color/white" />
-
-                            <TextView
-                                android:id="@+id/tvTotalUsers"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0"
-                                android:textSize="22sp"
-                                android:textStyle="bold"
-                                android:textColor="@color/white"
-                                android:layout_marginTop="12dp"
-                                android:includeFontPadding="false"
-                                android:lineSpacingExtra="0sp" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Toplam Sakin"
-                                android:textSize="11sp"
-                                android:textColor="@color/white"
-                                android:layout_marginTop="4px"
-                                android:includeFontPadding="false" />
-
-                        </LinearLayout>
-
-                    </androidx.cardview.widget.CardView>
-
-                    <!-- Toplam Aidatlar -->
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="0dp"
-                        android:layout_height="140dp"
-                        android:layout_weight="1"
-                        android:layout_marginStart="8dp"
-                        app:cardCornerRadius="12dp"
-                        app:cardElevation="4dp"
-                        android:backgroundTint="#27ae60">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical"
-                            android:padding="16dp"
-                            android:gravity="center">
-
-                            <ImageView
-                                android:layout_width="35dp"
-                                android:layout_height="35dp"
-                                android:src="@drawable/ic_receipt"
-                                android:tint="@color/white" />
-
-                            <TextView
-                                android:id="@+id/tvTotalDues"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0"
-                                android:textSize="22sp"
-                                android:textStyle="bold"
-                                android:textColor="@color/white"
-                                android:layout_marginTop="12dp"
-                                android:includeFontPadding="false"
-                                android:lineSpacingExtra="0sp" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Toplam Aidat"
-                                android:textSize="11sp"
-                                android:textColor="@color/white"
-                                android:layout_marginTop="4px"
-                                android:includeFontPadding="false" />
-
-                        </LinearLayout>
-
-                    </androidx.cardview.widget.CardView>
-
-                </LinearLayout>
-
-                <!-- İstatistik Kartları - 2. Satır -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="8dp">
-
-                    <!-- Bekleyen Şikayetler -->
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="0dp"
-                        android:layout_height="140dp"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="8dp"
-                        app:cardCornerRadius="12dp"
-                        app:cardElevation="4dp"
-                        android:backgroundTint="#f39c12">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical"
-                            android:padding="16dp"
-                            android:gravity="center">
-
-                            <ImageView
-                                android:layout_width="35dp"
-                                android:layout_height="35dp"
-                                android:src="@drawable/ic_warning"
-                                android:tint="@color/white" />
-
-                            <TextView
-                                android:id="@+id/tvPendingComplaints"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0"
-                                android:textSize="22sp"
-                                android:textStyle="bold"
-                                android:textColor="@color/white"
-                                android:layout_marginTop="12dp"
-                                android:includeFontPadding="false"
-                                android:lineSpacingExtra="0sp" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Bekleyen Şikayet"
-                                android:textSize="11sp"
-                                android:textColor="@color/white"
-                                android:layout_marginTop="4px"
-                                android:includeFontPadding="false" />
-
-                        </LinearLayout>
-
-                    </androidx.cardview.widget.CardView>
-
-                    <!-- Toplam Duyurular -->
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="0dp"
-                        android:layout_height="140dp"
-                        android:layout_weight="1"
-                        android:layout_marginStart="8dp"
-                        app:cardCornerRadius="12dp"
-                        app:cardElevation="4dp"
-                        android:backgroundTint="#3498db">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical"
-                            android:padding="16dp"
-                            android:gravity="center">
-
-                            <ImageView
-                                android:layout_width="35dp"
-                                android:layout_height="35dp"
-                                android:src="@drawable/ic_announcement"
-                                android:tint="@color/white" />
-
-                            <TextView
-                                android:id="@+id/tvTotalAnnouncements"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0"
-                                android:textSize="22sp"
-                                android:textStyle="bold"
-                                android:textColor="@color/white"
-                                android:layout_marginTop="12dp"
-                                android:includeFontPadding="false"
-                                android:lineSpacingExtra="0sp" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Toplam Duyuru"
-                                android:textSize="11sp"
-                                android:textColor="@color/white"
-                                android:layout_marginTop="4px"
-                                android:includeFontPadding="false" />
-
-                        </LinearLayout>
-
-                    </androidx.cardview.widget.CardView>
-
-                </LinearLayout>
-
-                <!-- Gecikme İstatistikleri -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="16dp">
-
-                    <!-- Gecikmiş Aidatlar -->
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="0dp"
-                        android:layout_height="100dp"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="8dp"
-                        app:cardCornerRadius="12dp"
-                        app:cardElevation="4dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical"
-                            android:padding="12dp"
-                            android:gravity="center">
-
-                            <TextView
-                                android:id="@+id/tvOverdueDues"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0"
-                                android:textSize="18sp"
-                                android:textStyle="bold"
-                                android:textColor="#e74c3c"
-                                android:includeFontPadding="false" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Gecikmiş Aidat"
-                                android:textSize="10sp"
-                                android:textColor="#808080"
-                                android:gravity="center"
-                                android:layout_marginTop="4px"
-                                android:includeFontPadding="false" />
-
-                        </LinearLayout>
-
-                    </androidx.cardview.widget.CardView>
-
-                    <!-- Toplam Gecikme Ücreti -->
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="0dp"
-                        android:layout_height="100dp"
-                        android:layout_weight="1"
-                        android:layout_marginStart="8dp"
-                        app:cardCornerRadius="12dp"
-                        app:cardElevation="4dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical"
-                            android:padding="12dp"
-                            android:gravity="center">
-
-                            <TextView
-                                android:id="@+id/tvTotalLateFees"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="₺0.00"
-                                android:textSize="18sp"
-                                android:textStyle="bold"
-                                android:textColor="#e74c3c"
-                                android:includeFontPadding="false" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Gecikme Ücreti"
-                                android:textSize="10sp"
-                                android:textColor="#808080"
-                                android:gravity="center"
-                                android:layout_marginTop="4px"
-                                android:includeFontPadding="false" />
-
-                        </LinearLayout>
-
-                    </androidx.cardview.widget.CardView>
-
-                </LinearLayout>
-
-                <!-- Hızlı Erişim Butonları -->
-                <androidx.cardview.widget.CardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="4dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Hızlı Erişim"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:layout_marginBottom="12dp" />
-
-                        <!-- 1. Satır Butonları -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_marginBottom="8dp">
-
-                            <Button
-                                android:id="@+id/btnAidat"
-                                android:layout_width="0dp"
-                                android:layout_height="100dp"
-                                android:layout_weight="1"
-                                android:layout_marginEnd="8dp"
-                                android:text="Aidatlar"
-                                android:textColor="@color/white"
-                                android:backgroundTint="#27ae60"
-                                android:textSize="14sp" />
-
-                            <Button
-                                android:id="@+id/btnDuyurular"
-                                android:layout_width="0dp"
-                                android:layout_height="100dp"
-                                android:layout_weight="1"
-                                android:layout_marginStart="8dp"
-                                android:text="Duyurular"
-                                android:textColor="@color/white"
-                                android:backgroundTint="#3498db"
-                                android:textSize="14sp" />
-                            <!-- BU SATIRLARI EKLE -->
-                            android:soundEffectsEnabled="true"
-                            android:focusable="true"
-                            android:clickable="true"
-                            android:longClickable="false" />
-                        </LinearLayout>
-
-                        <!-- 2. Satır Butonları -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_marginBottom="8dp">
-
-                            <Button
-                                android:id="@+id/btnBakim"
-                                android:layout_width="0dp"
-                                android:layout_height="100dp"
-                                android:layout_weight="1"
-                                android:layout_marginEnd="8dp"
-                                android:text="Bakım"
-                                android:textColor="@color/white"
-                                android:backgroundTint="#f39c12"
-                                android:textSize="14sp" />
-
-                            <Button
-                                android:id="@+id/btnSikayetler"
-                                android:layout_width="0dp"
-                                android:layout_height="100dp"
-                                android:layout_weight="1"
-                                android:layout_marginStart="8dp"
-                                android:text="Şikayetler"
-                                android:textColor="@color/white"
-                                android:backgroundTint="#e74c3c"
-                                android:textSize="14sp" />
-
-                        </LinearLayout>
-
-                        <!-- GARAJ AÇ BUTONU -->
-                        <Button
-                            android:id="@+id/btnGarajAc"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="GARAJ AÇ"
-                            android:background="@drawable/btn_garaj_ripple"
-                            android:textColor="#FFFFFF"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:layout_marginTop="8dp"
-                            android:padding="16dp"
-                            android:foreground="?android:attr/selectableItemBackground"
-                            android:clickable="true"
-                            android:focusable="true"/>
-
-                    </LinearLayout>
-
-                </androidx.cardview.widget.CardView>
-
-                <!-- Yenile Butonu -->
                 <Button
-                    android:id="@+id/btnRefresh"
-                    android:layout_width="match_parent"
+                    android:id="@+id/btnNavDashboard"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="Verileri Yenile"
+                    android:layout_weight="1"
+                    android:text="Ana Sayfa"
                     android:textColor="@color/white"
-                    android:backgroundTint="#4361ee"
-                    android:textSize="14sp" />
+                    android:background="@android:color/transparent"
+                    android:textSize="12sp" />
+
+                <Button
+                    android:id="@+id/btnNavDuyurular"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Duyurular"
+                    android:textColor="@color/white"
+                    android:background="@android:color/transparent"
+                    android:textSize="12sp" />
+
+                <Button
+                    android:id="@+id/btnNavAidat"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Aidatlar"
+                    android:textColor="@color/white"
+                    android:background="@android:color/transparent"
+                    android:textSize="12sp" />
+
+                <Button
+                    android:id="@+id/btnNavSikayetler"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Şikayetler"
+                    android:textColor="@color/white"
+                    android:background="@android:color/transparent"
+                    android:textSize="12sp" />
 
             </LinearLayout>
-        </ScrollView>
-
-        <!-- Basit Bottom Navigation -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:background="#4361ee"
-            android:padding="8dp">
-
-            <Button
-                android:id="@+id/btnNavDashboard"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Ana Sayfa"
-                android:textColor="@color/white"
-                android:background="@android:color/transparent"
-                android:textSize="12sp" />
-
-            <Button
-                android:id="@+id/btnNavDuyurular"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Duyurular"
-                android:textColor="@color/white"
-                android:background="@android:color/transparent"
-                android:textSize="12sp" />
-
-            <Button
-                android:id="@+id/btnNavAidat"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Aidatlar"
-                android:textColor="@color/white"
-                android:background="@android:color/transparent"
-                android:textSize="12sp" />
-
-            <Button
-                android:id="@+id/btnNavSikayetler"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Şikayetler"
-                android:textColor="@color/white"
-                android:background="@android:color/transparent"
-                android:textSize="12sp" />
 
         </LinearLayout>
 
-    </LinearLayout>
+    </RelativeLayout>
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigation_view"

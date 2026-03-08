@@ -7,18 +7,16 @@ import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import org.json.JSONObject
-import java.io.BufferedReader
-import java.io.InputStreamReader
-import java.io.OutputStreamWriter
+import at.favre.lib.crypto.bcrypt.BCrypt
+import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
-import java.net.URLEncoder
+import java.security.MessageDigest
+import java.util.*
 import kotlin.concurrent.thread
-import android.widget.CheckBox
-import com.baser.apartman.workers.WidgetUpdateWorker
 
 class MainActivity : AppCompatActivity() {
 
@@ -27,38 +25,19 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        //WeatherWidgetUtils.updateWidgets(this)
-        val weatherWidget = findViewById<com.baser.apartman.weather.WeatherWidget>(R.id.weatherWidget)
+
         ivBackground = findViewById(R.id.ivBackground)
+
+        // ApiManager'ı başlat
+        ApiManager.initialize(this)
 
         // ÖNCE KAYDEDİLMİŞ KULLANICI VAR MI KONTROL ET
         checkSavedUser()
 
         // Webden resmi yükle
         loadBackgroundImage()
-        startWidgetAutoUpdate()
         setupClickListeners()
     }
-
-    // EKSİK FONKSİYONU EKLEYİN - BAŞLANGIÇ
-    private fun startWidgetAutoUpdate() {
-        try {
-            println("🔧 Widget otomatik güncelleme başlatılıyor...")
-
-            // ✅ 1. WorkManager'ı AKTİF ET (yorumu kaldır)
-            WidgetUpdateWorker.scheduleWidgetUpdate(this)
-
-            // ✅ 2. Anlık güncelleme de yap
-            com.baser.apartman.widgets.AidatWidgetUtils.updateWidgets(this)
-            com.baser.apartman.widgets.DuyuruWidgetUtils.updateWidgets(this)
-
-            println("✅ Widget otomatik güncelleme başlatıldı")
-
-        } catch (e: Exception) {
-            println("❌ Widget güncelleme hatası: ${e.message}")
-        }
-    }
-    // EKSİK FONKSİYONU EKLEYİN - BİTİŞ
 
     private fun checkSavedUser() {
         val sharedPref = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
@@ -98,16 +77,7 @@ class MainActivity : AppCompatActivity() {
             apply()
         }
 
-        // YENİ EKLENEN KOD - widget_prefs'e de aynı bilgileri kaydet
-        val widgetPrefs = getSharedPreferences("widget_prefs", Context.MODE_PRIVATE)
-        widgetPrefs.edit().apply {
-            putString("user_email", email)
-            putString("user_type", type)
-            putString("user_name", name)
-            apply()
-        }
-
-        println("🔍 LOGIN BAŞARILI - WIDGET İÇİN EMAIL KAYDEDİLDİ: $email")
+        println("🔍 LOGIN BAŞARILI - EMAIL KAYDEDİLDİ: $email")
 
         val intent = Intent(this, DashboardActivity::class.java)
         intent.putExtra("user_email", email)
@@ -148,6 +118,8 @@ class MainActivity : AppCompatActivity() {
         val etPassword = findViewById<android.widget.EditText>(R.id.etPassword)
         val progressBar = findViewById<android.widget.ProgressBar>(R.id.progressBar)
         val cbBeniHatirla = findViewById<android.widget.CheckBox>(R.id.cbBeniHatirla)
+        val tvForgotPassword = findViewById<TextView>(R.id.tvForgotPassword)
+        val tvRegister = findViewById<TextView>(R.id.tvRegister)
 
         btnLogin.setOnClickListener {
             val email = etEmail.text.toString().trim()
@@ -160,11 +132,23 @@ class MainActivity : AppCompatActivity() {
                 login(email, password, rememberMe, progressBar, btnLogin)
             }
         }
+
+        // Şifremi Unuttum tıklama
+        tvForgotPassword.setOnClickListener {
+            val intent = Intent(this, ForgotPasswordActivity::class.java)
+            startActivity(intent)
+        }
+
+        // Yeni Kayıt Ol tıklama
+        tvRegister.setOnClickListener {
+            val intent = Intent(this, RegisterActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun login(
         email: String,
-        pass: String,
+        password: String,
         rememberMe: Boolean,
         progressBar: android.widget.ProgressBar,
         btnLogin: android.widget.Button
@@ -172,130 +156,191 @@ class MainActivity : AppCompatActivity() {
         progressBar.visibility = View.VISIBLE
         btnLogin.visibility = View.INVISIBLE
 
-        Thread {
-            var result = ""
-            var responseCode = 0
+        // SQL sorgusu ile kullanıcıyı kontrol et
+        val sqlQuery = "SELECT id, name, email, phone, apartment_block, apartment_number, user_type, resident_type, is_responsible_for_dues, is_residing, status, password FROM apartman_users WHERE email = '$email'"
 
-            try {
-                val url = URL("http://baser.org/apartman/api_login_gemini.php")
-                val conn = url.openConnection() as HttpURLConnection
-
-                conn.requestMethod = "POST"
-                conn.doOutput = true
-                conn.doInput = true
-                conn.connectTimeout = 15000
-                conn.readTimeout = 15000
-                conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
-                conn.setRequestProperty("Accept", "application/json")
-
-                val postData = "email=${URLEncoder.encode(email, "UTF-8")}&password=${URLEncoder.encode(pass, "UTF-8")}"
-                println("🔍 GÖNDERİLEN VERİ: $postData")
-
-                val outputStream = conn.outputStream
-                OutputStreamWriter(outputStream, "UTF-8").use { writer ->
-                    writer.write(postData)
-                    writer.flush()
-                }
-
-                responseCode = conn.responseCode
-                println("🔍 HTTP YANIT KODU: $responseCode")
-
-                if (responseCode == HttpURLConnection.HTTP_OK) {
-                    val inputStream = conn.inputStream
-                    result = BufferedReader(InputStreamReader(inputStream)).use { it.readText() }
-                    println("🔍 BAŞARILI YANIT: $result")
-                } else {
-                    try {
-                        val errorStream = conn.errorStream
-                        result = BufferedReader(InputStreamReader(errorStream)).use { it.readText() }
-                        println("🔍 HATA YANITI: $result")
-                    } catch (e: Exception) {
-                        result = "HTTP Hatası: $responseCode"
-                    }
-                }
-
-            } catch (e: Exception) {
-                result = "Bağlantı Hatası: ${e.message}"
-                println("🔍 EXCEPTION: ${e.message}")
-            }
-
-            runOnUiThread {
+        ApiManager.executeSQLQuery(
+            context = this,
+            query = sqlQuery,
+            onSuccess = { result ->
                 progressBar.visibility = View.GONE
                 btnLogin.visibility = View.VISIBLE
 
-                if (responseCode != 0 && responseCode != 200) {
-                    Toast.makeText(this, "HTTP: $responseCode", Toast.LENGTH_SHORT).show()
-                }
-
-                handleLoginResult(result, email, rememberMe)
+                handleLoginResult(result, email, password, rememberMe)
+            },
+            onError = { error ->
+                progressBar.visibility = View.GONE
+                btnLogin.visibility = View.VISIBLE
+                Toast.makeText(this, "Bağlantı hatası: $error", Toast.LENGTH_SHORT).show()
             }
-        }.start()
+        )
     }
 
-    private fun handleLoginResult(jsonResponse: String, email: String, rememberMe: Boolean) {
+    private fun handleLoginResult(csvData: String, email: String, password: String, rememberMe: Boolean) {
+        ProfileImageManager.clearCacheForUser(this, email)
         try {
-            println("🔍 SUNUCU CEVABI: $jsonResponse")
+            println("🔍 LOGIN SONUCU: $csvData")
 
-            if (jsonResponse.isBlank()) {
-                Toast.makeText(this, "Sunucu boş cevap döndü", Toast.LENGTH_LONG).show()
+            if (csvData.isBlank() || csvData.contains("AFFECTED ROWS: 0")) {
+                Toast.makeText(this, "Email veya şifre hatalı", Toast.LENGTH_LONG).show()
                 return
             }
 
-            if (jsonResponse.startsWith("{")) {
-                val jsonObject = JSONObject(jsonResponse)
-                val success = jsonObject.getBoolean("success")
-                val message = jsonObject.getString("message")
-
-                if (success) {
-                    val userType = if (jsonObject.has("user_type")) {
-                        jsonObject.getString("user_type")
-                    } else {
-                        when {
-                            email.contains("admin", ignoreCase = true) -> "admin"
-                            email.contains("manager", ignoreCase = true) -> "manager"
-                            else -> "resident"
-                        }
-                    }
-
-                    val userName = if (jsonObject.has("user_name")) {
-                        jsonObject.getString("user_name")
-                    } else {
-                        email
-                    }
-
-                    println("🔍 KULLANICI BİLGİLERİ - Type: $userType, Name: $userName, Beni Hatırla: $rememberMe")
-
-                    Toast.makeText(this, "✓ $message", Toast.LENGTH_LONG).show()
-
-                    // Kullanıcı bilgilerini kaydet
-                    saveUserInfo(email, userType, userName, rememberMe)
-
-                    // DÜZELTME: userEmail yerine email parametresini kullan
-                    onLoginSuccess(email, userType, userName, rememberMe)
-
-                } else {
-                    Toast.makeText(this, "✗ $message", Toast.LENGTH_LONG).show()
-                }
-            } else {
-                Toast.makeText(this, "⚠ Beklenmeyen sunucu cevabı", Toast.LENGTH_LONG).show()
+            val lines = csvData.trim().split("\n")
+            if (lines.size <= 1) {
+                Toast.makeText(this, "Kullanıcı bulunamadı", Toast.LENGTH_LONG).show()
+                return
             }
 
+            // CSV'yi parse et
+            for (i in 1 until lines.size) {
+                val line = lines[i].trim()
+                if (line.isNotEmpty()) {
+                    try {
+                        val fields = parseCSVLine(line)
+                        if (fields.size >= 12) { // 12 alan (password dahil)
+                            val userId = fields[0]
+                            val userName = fields[1]
+                            val userEmail = fields[2]
+                            val userPhone = fields[3]
+                            val apartmentBlock = fields[4]
+                            val apartmentNumber = fields[5]
+                            val userType = fields[6]
+                            val residentType = fields[7]
+                            val isResponsibleForDues = fields[8]
+                            val isResiding = fields[9]
+                            val status = fields[10]
+                            val dbPassword = fields[11] // Veritabanındaki şifre
+
+                            println("🔍 KULLANICI BİLGİLERİ - Email: $userEmail, Status: $status")
+
+                            // Kullanıcı durumunu kontrol et
+                            if (status == "pending") {
+                                Toast.makeText(this, "Hesabınız henüz aktif değil. Lütfen yöneticiden aktivasyon bekleyin.", Toast.LENGTH_LONG).show()
+                                return
+                            }
+
+                            if (status == "inactive") {
+                                Toast.makeText(this, "Hesabınız pasif durumda. Lütfen yönetici ile iletişime geçin.", Toast.LENGTH_LONG).show()
+                                return
+                            }
+
+                            // Şifre kontrolü - BCrypt desteği ile
+                            if (verifyPassword(password, dbPassword)) {
+                                // Başarılı giriş
+                                Toast.makeText(this, "Giriş başarılı!", Toast.LENGTH_LONG).show()
+
+                                // Kullanıcı bilgilerini kaydet
+                                saveUserInfo(userId, email, userType, userName, rememberMe)
+
+                                // Dashboard'a yönlendir
+                                onLoginSuccess(email, userType, userName, rememberMe)
+                            } else {
+                                Toast.makeText(this, "Email veya şifre hatalı", Toast.LENGTH_LONG).show()
+                            }
+                            return
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+            }
+
+            Toast.makeText(this, "Kullanıcı bulunamadı", Toast.LENGTH_LONG).show()
+
         } catch (e: Exception) {
-            Toast.makeText(this, "❌ Veri işleme hatası: ${e.message}", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Veri işleme hatası: ${e.message}", Toast.LENGTH_LONG).show()
             println("🔍 HATA: ${e.message}")
         }
     }
 
-    private fun saveUserInfo(email: String, userType: String, userName: String, rememberMe: Boolean) {
+    private fun verifyPassword(inputPassword: String, dbPassword: String): Boolean {
+        // BCrypt hash kontrolü (PHP password_hash() formatı)
+        if (dbPassword.startsWith("$2y$") || dbPassword.startsWith("$2a$") || dbPassword.startsWith("$2b$")) {
+            return verifyBcryptPassword(inputPassword, dbPassword)
+        }
+
+        // MD5 hash kontrolü
+        val md5Hash = md5(inputPassword)
+        if (md5Hash == dbPassword) {
+            return true
+        }
+
+        // SHA-256 hash kontrolü
+        val sha256Hash = sha256(inputPassword)
+        if (sha256Hash == dbPassword) {
+            return true
+        }
+
+        // Direkt eşleşme (plain text)
+        if (inputPassword == dbPassword) {
+            return true
+        }
+
+        return false
+    }
+
+    private fun verifyBcryptPassword(password: String, bcryptHash: String): Boolean {
+        return try {
+            // BCrypt.verifyer() ile hash kontrolü
+            val result = BCrypt.verifyer().verify(password.toCharArray(), bcryptHash)
+            result.verified
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
+    private fun md5(input: String): String {
+        return try {
+            val md = MessageDigest.getInstance("MD5")
+            val digested = md.digest(input.toByteArray())
+            digested.joinToString("") { "%02x".format(it) }
+        } catch (e: Exception) {
+            ""
+        }
+    }
+
+    private fun sha256(input: String): String {
+        return try {
+            val md = MessageDigest.getInstance("SHA-256")
+            val digested = md.digest(input.toByteArray())
+            digested.joinToString("") { "%02x".format(it) }
+        } catch (e: Exception) {
+            ""
+        }
+    }
+
+    private fun parseCSVLine(line: String): List<String> {
+        val result = ArrayList<String>()
+        var current = StringBuilder()
+        var inQuotes = false
+
+        for (i in line.indices) {
+            when {
+                line[i] == '"' -> inQuotes = !inQuotes
+                line[i] == ',' && !inQuotes -> {
+                    result.add(current.toString())
+                    current = StringBuilder()
+                }
+                else -> current.append(line[i])
+            }
+        }
+        result.add(current.toString())
+        return result
+    }
+
+    private fun saveUserInfo(userId: String, email: String, userType: String, userName: String, rememberMe: Boolean) {
         val sharedPref = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
         with(sharedPref.edit()) {
+            putString("user_id", userId)
             putString("user_email", email)
             putString("user_type", userType)
             putString("user_name", userName)
-            putBoolean("beni_hatirla", rememberMe) // "Beni Hatırla" durumunu kaydet
+            putBoolean("beni_hatirla", rememberMe)
             apply()
         }
-        println("🔍 KAYDEDİLEN BİLGİLER - Email: $email, Type: $userType, Name: $userName, Beni Hatırla: $rememberMe")
+        println("🔍 KAYDEDİLEN BİLGİLER - ID: $userId, Email: $email, Type: $userType, Name: $userName")
     }
 
     override fun onResume() {

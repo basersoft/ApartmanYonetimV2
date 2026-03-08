@@ -77,7 +77,7 @@ class AdminAidatActivity : BaseActivity() {
 
         val adapter = ViewPagerAdapter(this)
         adapter.addFragment(AidatListesiFragment(), "Aidat Listesi")
-        adapter.addFragment(AidatEklemeFragment(), "Aidat Ekle")
+        // AidatEklemeFragment kaldırıldı - Web'den yönetilecek
 
         viewPager.adapter = adapter
 

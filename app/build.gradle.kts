@@ -44,34 +44,43 @@ dependencies {
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.cardview:cardview:1.0.0")
-    
+    implementation("at.favre.lib:bcrypt:0.10.2")
     // Test
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    
+
     // Network
     implementation("com.android.volley:volley:1.2.1")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
-    
+
     // JSON
-    implementation("org.json:json:20240303")
+
     implementation("com.google.code.gson:gson:2.10.1")
-    
+
     // Location
     implementation("com.google.android.gms:play-services-location:21.2.0")
-    
+
     // Lifecycle & Coroutines
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
-    
+
     // Image Loading
     implementation("com.github.bumptech.glide:glide:4.16.0")
-    
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     // WorkManager
     implementation("androidx.work:work-runtime-ktx:2.9.0")
+
+// veya daha hafif bir çözüm için:
+    implementation("com.mikhaellopez:circularprogressbar:3.1.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+    implementation("com.google.android.material:material:1.10.0")
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
+
+
 }

@@ -2,7 +2,6 @@ package com.baser.apartman
 
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.ProgressBar
 import android.widget.Toast
@@ -11,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import org.json.JSONArray
 import org.json.JSONObject
 import com.baser.apartman.widgets.AidatWidgetUtils
-import com.baser.apartman.workers.WidgetUpdateWorker
+
 class AidatActivity : BaseActivity() {
 
     private lateinit var adapter: AidatAdapter
@@ -20,6 +19,7 @@ class AidatActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         // WIDGET'DAN GELEN EMAIL BİLGİSİNİ KONTROL ET
         val widgetEmail = intent.getStringExtra("user_email")
         val fromWidget = intent.getBooleanExtra("from_widget", false)
@@ -27,10 +27,10 @@ class AidatActivity : BaseActivity() {
         if (fromWidget && !widgetEmail.isNullOrEmpty()) {
             println("🔍 WIDGET'DAN GELEN EMAIL: $widgetEmail")
             userEmail = widgetEmail
-            // Diğer bilgileri de güncelle
             userType = intent.getStringExtra("user_type") ?: userType
             userName = intent.getStringExtra("user_name") ?: userName
         }
+
         // ÖNEMLİ: Admin veya manager ise AdminAidatActivity'ye yönlendir
         if (userType == "admin" || userType == "manager") {
             val intent = Intent(this, AdminAidatActivity::class.java).apply {
@@ -46,7 +46,6 @@ class AidatActivity : BaseActivity() {
         // Normal kullanıcı ise mevcut akışa devam et
         setContentView(R.layout.activity_aidat)
 
-        // ÖNCE VIEW'LERİ BUL, SONRA NAVIGATION
         if (!setupViews()) {
             Toast.makeText(this, "Layout hatası! Sayfa kapatılıyor.", Toast.LENGTH_LONG).show()
             finish()
@@ -55,7 +54,9 @@ class AidatActivity : BaseActivity() {
 
         setupNavigation()
         setupBottomNavigation()
-        loadAidatFromServer()
+
+        // YENİ: API'den aidatları yükle
+        loadAidatFromApi()
     }
 
     private fun setupViews(): Boolean {
@@ -63,7 +64,9 @@ class AidatActivity : BaseActivity() {
             recyclerView = findViewById(R.id.recyclerViewAidat)
             progressBar = findViewById(R.id.progressBar)
 
-            adapter = AidatAdapter()
+            adapter = AidatAdapter(onOdemeClick = { aidat ->
+                onOdemeYapClick(aidat)
+            })
             recyclerView.layoutManager = LinearLayoutManager(this)
             recyclerView.adapter = adapter
             true
@@ -73,20 +76,45 @@ class AidatActivity : BaseActivity() {
         }
     }
 
-    // Aidat ödendiğinde
-    private fun onAidatOdendi() {
-        // Widget'ı güncelle
-        AidatWidgetUtils.updateWidgets(this)
-        Toast.makeText(this, "Aidat ödendi ve widget güncellendi", Toast.LENGTH_SHORT).show()
+    // YENİ: API'den aidat yükleme
+    // YENİ: API'den aidat yükleme
+    private fun loadAidatFromApi() {
+        progressBar.visibility = android.view.View.VISIBLE
+
+        AidatApiService.getAndroidDues(
+            userEmail = userEmail ?: "",
+            userType = userType ?: "resident",
+            onSuccess = { aidatList ->
+                runOnUiThread {
+                    progressBar.visibility = android.view.View.GONE
+
+                    // API'den gelen listeyi adapter'a ver
+                    adapter.setAidatList(aidatList)
+
+                    // Widget güncelle
+                    updateWidgetWithApiData(aidatList)
+
+                    if (aidatList.isEmpty()) {
+                        Toast.makeText(this, "Aidat kaydı bulunamadı", Toast.LENGTH_LONG).show()
+                    } else {
+                        Toast.makeText(this, "${aidatList.size} aidat kaydı yüklendi", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            },
+            onError = { error ->
+                runOnUiThread {
+                    progressBar.visibility = android.view.View.GONE
+                    Toast.makeText(this, "Aidat yükleme hatası: $error", Toast.LENGTH_LONG).show()
+
+                    // API başarısız olursa eski yönteme dön
+                    loadAidatFromServer()
+                }
+            }
+        )
     }
 
-    // Yeni aidat eklendiğinde
-    private fun onYeniAidatEklendi() {
-        // Widget'ı güncelle
-        AidatWidgetUtils.onNewAidatAdded(this)
-        Toast.makeText(this, "Yeni aidat eklendi ve widget güncellendi", Toast.LENGTH_SHORT).show()
-    }
-
+    // ESKİ: Eski API'den yükleme (geriye uyumluluk)
+    // ESKİ: Eski API'den yükleme (geriye uyumluluk)
     private fun loadAidatFromServer() {
         progressBar.visibility = android.view.View.VISIBLE
 
@@ -98,159 +126,74 @@ class AidatActivity : BaseActivity() {
             endpoint = "api/aidat_api.php",
             params = params,
             onSuccess = { response ->
-                progressBar.visibility = android.view.View.GONE
-                handleAidatResponse(response)
+                runOnUiThread {
+                    progressBar.visibility = android.view.View.GONE
+                    handleAidatResponse(response)
+                }
             },
             onError = { error ->
-                progressBar.visibility = android.view.View.GONE
-                Toast.makeText(this, "Aidat yükleme hatası: $error", Toast.LENGTH_LONG).show()
-                showSampleData()
+                runOnUiThread {
+                    progressBar.visibility = android.view.View.GONE
+                    Toast.makeText(this, "Aidat yükleme hatası: $error", Toast.LENGTH_LONG).show()
+                    showSampleData()
+                }
             }
         )
     }
 
-    private fun handleAidatResponse(response: String) {
+    // YENİ: Widget güncelleme fonksiyonu (API verisiyle)
+    private fun updateWidgetWithApiData(aidatList: List<Aidat>) {
+        if (aidatList.isEmpty()) return
+
         try {
-            println("🔍 AIDAT API YANITI: $response")
+            // İstatistikleri hesapla
+            var gecikmisAidatSayisi = 0
+            var toplamBorc = 0.0
+            var odenecekAidatSayisi = 0
+            var enYakinSonTarih = ""
+            var sonAidatAy = aidatList.lastOrNull()?.description ?: ""
+            var sonAidatDurum = aidatList.lastOrNull()?.durum ?: "Bekleniyor"
 
-            val jsonObject = JSONObject(response)
-            val success = jsonObject.getBoolean("success")
-
-            if (success) {
-                val aidatArray = jsonObject.getJSONArray("aidatlar")
-                val aidatList = mutableListOf<Aidat>()
-
-                // WIDGET İÇİN DETAYLI BİLGİLER
-                var sonAidatDurum = "Bekleniyor"
-                var gecikmisAidatSayisi = 0
-                var toplamBorc = 0.0
-                var toplamAidatSayisi = aidatArray.length()
-                var odenecekAidatSayisi = 0
-                var enYakinSonTarih = ""
-                var sonAidatAy = ""
-
-                for (i in 0 until aidatArray.length()) {
-                    val item = aidatArray.getJSONObject(i)
-                    val durum = item.getString("durum")
-                    val miktarStr = item.getString("miktar").replace("₺", "").replace(",", ".")
-                    val miktar = miktarStr.toDoubleOrNull() ?: 0.0
-
-                    // SON AIDAT BİLGİLERİ
-                    if (i == aidatArray.length() - 1) {
-                        sonAidatDurum = durum
-                        sonAidatAy = item.getString("ay")
-                    }
-
-                    // GECİKMİŞ AIDATLARI SAY VE BORÇ HESAPLA
-                    if (durum == "GECİKMİŞ") {
-                        gecikmisAidatSayisi++
-                        toplamBorc += miktar
-                    }
-
-                    // ÖDENMEMİŞ AIDATLARI SAY (Gecikmiş + Bekliyor)
-                    if (durum == "GECİKMİŞ" || durum == "BEKLİYOR") {
-                        odenecekAidatSayisi++
-                    }
-
-                    // EN YAKIN SON TARİHİ BUL
-                    val sonTarih = if (item.has("son_tarih") && !item.isNull("son_tarih") && item.getString("son_tarih").isNotEmpty())
-                        item.getString("son_tarih") else ""
-
-                    if (sonTarih.isNotEmpty() && (durum == "BEKLİYOR" || durum == "GECİKMİŞ")) {
-                        if (enYakinSonTarih.isEmpty() || sonTarih < enYakinSonTarih) {
-                            enYakinSonTarih = sonTarih
-                        }
-                    }
-
-                    val aidat = Aidat(
-                        ay = item.getString("ay"),
-                        miktar = item.getString("miktar"),
-                        durum = durum,
-                        durumRenk = item.getString("durumRenk"),
-                        son_tarih = sonTarih,
-                        odeme_tarihi = if (item.has("odeme_tarihi") && !item.isNull("odeme_tarihi") && item.getString("odeme_tarihi").isNotEmpty())
-                            item.getString("odeme_tarihi") else null,
-                        kullanici_adi = item.optString("kullanici_adi", ""),
-                        kullanici_email = item.optString("kullanici_email", ""),
-                        id = item.optInt("id", 0),
-                        userId = item.optInt("user_id", 0),
-                        userName = item.optString("user_name", ""),
-                        apartmentBlock = item.optString("apartment_block", ""),
-                        apartmentNumber = item.optString("apartment_number", ""),
-                        description = item.optString("description", ""),
-                        lateFeeAmount = item.optDouble("late_fee_amount", 0.0),
-                        amount = item.optDouble("amount", 0.0)
-                    )
-                    aidatList.add(aidat)
+            for (aidat in aidatList) {
+                // Gecikmiş aidatları say
+                if (aidat.isReallyOverdue || aidat.durum.lowercase() == "overdue") {
+                    gecikmisAidatSayisi++
+                    toplamBorc += aidat.calculatedTotalAmount - aidat.paidAmount
                 }
 
-                adapter.setAidatList(aidatList)
+                // Ödenmemiş aidatları say
+                if (!aidat.isFullyPaid) {
+                    odenecekAidatSayisi++
 
-                // WIDGET'I DETAYLI BİLGİLERLE GÜNCELLE
-                updateWidgetWithDetailedData(
-                    sonDurum = sonAidatDurum,
-                    gecikmisSayi = gecikmisAidatSayisi,
-                    toplamBorc = toplamBorc,
-                    toplamAidatSayisi = toplamAidatSayisi,
-                    odenecekAidatSayisi = odenecekAidatSayisi,
-                    enYakinSonTarih = enYakinSonTarih,
-                    sonAy = sonAidatAy
-                )
-
-                if (aidatList.isEmpty()) {
-                    val message = jsonObject.optString("message", "Aidat kaydı bulunamadı")
-                    Toast.makeText(this, message, Toast.LENGTH_LONG).show()
-                } else {
-                    Toast.makeText(this, "${aidatList.size} aidat kaydı yüklendi", Toast.LENGTH_SHORT).show()
+                    // En yakın son tarihi bul
+                    if (aidat.son_tarih.isNotEmpty() &&
+                        (enYakinSonTarih.isEmpty() || aidat.son_tarih < enYakinSonTarih)) {
+                        enYakinSonTarih = aidat.son_tarih
+                    }
                 }
-
-            } else {
-                val message = jsonObject.getString("message")
-                Toast.makeText(this, message, Toast.LENGTH_LONG).show()
-                showSampleData()
             }
-
-        } catch (e: Exception) {
-            println("🔍 AIDAT İŞLEME HATASI: ${e.message}")
-            Toast.makeText(this, "Aidat verisi işleme hatası", Toast.LENGTH_LONG).show()
-            showSampleData()
-        }
-    }
-
-    // DETAYLI WIDGET GÜNCELLEME FONKSİYONU
-    private fun updateWidgetWithDetailedData(
-        sonDurum: String,
-        gecikmisSayi: Int,
-        toplamBorc: Double,
-        toplamAidatSayisi: Int,
-        odenecekAidatSayisi: Int,
-        enYakinSonTarih: String,
-        sonAy: String
-    ) {
-        try {
-            val sharedPreferences = getSharedPreferences("widget_prefs", Context.MODE_PRIVATE)
-            val editor = sharedPreferences.edit()
-
-            // Kullanıcı bilgilerini kaydet
-            editor.putString("user_email", userEmail ?: "")
-            editor.putString("user_type", userType ?: "user")
-            editor.putString("user_name", userName ?: "")
-
-            // Detaylı aidat bilgilerini kaydet
-            editor.putString("aidat_durum", sonDurum)
-            editor.putString("son_ay", sonAy)
-            editor.putFloat("toplam_borc", toplamBorc.toFloat())
-            editor.putInt("gecikmis_sayi", gecikmisSayi)
-            editor.putInt("toplam_aidat_sayisi", toplamAidatSayisi)
-            editor.putInt("odenecek_aidat_sayisi", odenecekAidatSayisi)
-            editor.putString("en_yakin_son_tarih", enYakinSonTarih)
 
             // Widget mesajını oluştur
             val widgetMesaj = when {
-                gecikmisSayi > 0 -> "Gecikmiş: $gecikmisSayi\nBorç: ₺${"%.2f".format(toplamBorc)}"
+                gecikmisAidatSayisi > 0 -> "Gecikmiş: $gecikmisAidatSayisi\nBorç: ₺${"%.2f".format(toplamBorc)}"
                 odenecekAidatSayisi > 0 -> "Ödenecek: $odenecekAidatSayisi\nSon Tarih: ${formatTarih(enYakinSonTarih)}"
-                else -> "Güncel\n$sonAy"
+                else -> "Güncel\n$sonAidatAy"
             }
+
+            // SharedPreferences'a kaydet
+            val sharedPreferences = getSharedPreferences("widget_prefs", Context.MODE_PRIVATE)
+            val editor = sharedPreferences.edit()
+
+            editor.putString("user_email", userEmail ?: "")
+            editor.putString("user_type", userType ?: "user")
+            editor.putString("user_name", userName ?: "")
+            editor.putString("aidat_durum", sonAidatDurum)
+            editor.putString("son_ay", sonAidatAy)
+            editor.putFloat("toplam_borc", toplamBorc.toFloat())
+            editor.putInt("gecikmis_sayi", gecikmisAidatSayisi)
+            editor.putInt("toplam_aidat_sayisi", aidatList.size)
+            editor.putInt("odenecek_aidat_sayisi", odenecekAidatSayisi)
+            editor.putString("en_yakin_son_tarih", enYakinSonTarih)
             editor.putString("widget_mesaj", widgetMesaj)
 
             editor.apply()
@@ -258,12 +201,55 @@ class AidatActivity : BaseActivity() {
             // Widget'ı güncelle
             AidatWidgetUtils.updateWidgets(this)
 
-            println("🔍 DETAYLI WIDGET GÜNCELLENDİ: $widgetMesaj")
-            println("🔍 KAYITLI EMAIL: ${sharedPreferences.getString("user_email", "BULUNAMADI")}")
+            println("🔍 API'DEN WIDGET GÜNCELLENDİ: $widgetMesaj")
 
         } catch (e: Exception) {
             println("🔍 WIDGET GÜNCELLEME HATASI: ${e.message}")
-            e.printStackTrace()
+        }
+    }
+
+    // ESKİ: Eski API yanıtını işleme
+    // ESKİ: Eski API yanıtını işleme
+    private fun handleAidatResponse(response: String) {
+        runOnUiThread {
+            try {
+                println("🔍 AIDAT API YANITI: $response")
+                val jsonObject = JSONObject(response)
+                val success = jsonObject.getBoolean("success")
+
+                if (success) {
+                    val aidatArray = jsonObject.getJSONArray("aidatlar")
+                    val aidatList = mutableListOf<Aidat>()
+
+                    for (i in 0 until aidatArray.length()) {
+                        val item = aidatArray.getJSONObject(i)
+                        val aidat = Aidat.fromJson(item)
+                        aidatList.add(aidat)
+                    }
+
+                    adapter.setAidatList(aidatList)
+
+                    // Widget güncelle
+                    updateWidgetWithApiData(aidatList)
+
+                    if (aidatList.isEmpty()) {
+                        val message = jsonObject.optString("message", "Aidat kaydı bulunamadı")
+                        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+                    } else {
+                        Toast.makeText(this, "${aidatList.size} aidat kaydı yüklendi", Toast.LENGTH_SHORT).show()
+                    }
+
+                } else {
+                    val message = jsonObject.getString("message")
+                    Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+                    showSampleData()
+                }
+
+            } catch (e: Exception) {
+                println("🔍 AIDAT İŞLEME HATASI: ${e.message}")
+                Toast.makeText(this, "Aidat verisi işleme hatası", Toast.LENGTH_LONG).show()
+                showSampleData()
+            }
         }
     }
 
@@ -304,5 +290,31 @@ class AidatActivity : BaseActivity() {
         )
         adapter.setAidatList(ornekAidatlar)
         Toast.makeText(this, "Örnek veriler gösteriliyor", Toast.LENGTH_SHORT).show()
+    }
+
+    // YENİ: Ödeme yap butonu tıklaması
+    // YENİ: Ödeme yap butonu tıklaması
+    fun onOdemeYapClick(aidat: Aidat) {
+        // SADECE ADMIN/MANAGER için ödeme dialog'u göster
+        if (userType == "admin" || userType == "manager") {
+            // Ödeme dialogunu göster
+            showOdemeDialog(aidat)
+        } else {
+            // Sakinler için mesaj göster
+            Toast.makeText(this, "Ödeme işlemleri için yönetici ile iletişime geçin.", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun showOdemeDialog(aidat: Aidat) {
+        val intent = Intent(this, OdemeDialogActivity::class.java)
+        intent.putExtra("due_id", aidat.id)
+        intent.putExtra("user_email", userEmail)
+        intent.putExtra("user_type", userType)
+        intent.putExtra("user_name", userName)
+        intent.putExtra("total_amount", aidat.calculatedTotalAmount)
+        intent.putExtra("remaining_amount", aidat.calculatedRemainingAmount)
+        intent.putExtra("description", aidat.description)
+        intent.putExtra("site_id", aidat.siteId)
+        startActivity(intent)
     }
 }

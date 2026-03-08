@@ -5,9 +5,9 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.location.Location
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -15,13 +15,12 @@ import android.os.Looper
 import android.view.MenuItem
 import android.view.animation.AnimationUtils
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
@@ -44,6 +43,9 @@ import java.util.Locale
 import android.content.Context
 import android.os.VibrationEffect
 import android.os.Vibrator
+import java.net.URL
+import javax.net.ssl.HttpsURLConnection
+
 class DashboardActivity : BaseActivity() {
 
     private lateinit var tvWelcome: TextView
@@ -56,6 +58,7 @@ class DashboardActivity : BaseActivity() {
     private lateinit var loadingIndicator: ProgressBar
     private lateinit var btnRefresh: Button
     private lateinit var btnGarajAc: Button
+    private lateinit var backgroundImage: ImageView
 
     // Coğrafi çember için
     private lateinit var tvDistance: TextView
@@ -106,8 +109,8 @@ class DashboardActivity : BaseActivity() {
     }
 
     private fun getApiUrl(): String {
-        return prefs.getString("api_url", "http://baser.org/apartman/api/api_dashboard_stats.php")
-            ?: "http://baser.org/apartman/api/api_dashboard_stats.php"
+        return prefs.getString("api_url", "http://baser.org/site/api/api_dashboard_stats.php")
+            ?: "http://baser.org/site/api/api_dashboard_stats.php"
     }
 
     // Konum hızı ayarını al
@@ -127,9 +130,6 @@ class DashboardActivity : BaseActivity() {
         // SharedPreferences başlat
         prefs = getSharedPreferences("ApartmanPrefs", MODE_PRIVATE)
 
-        // Kullanıcı bilgilerini BaseActivity'den al (artık protected metodlar)
-        // userEmail, userType, userName BaseActivity'den geliyor
-
         initViews()
         setupNavigation() // BaseActivity'den geliyor
         setupCustomBottomNavigation()
@@ -139,59 +139,11 @@ class DashboardActivity : BaseActivity() {
         checkLocationPermission()
         loadDashboardData()
 
+        // Arkaplan resmini yükle
+        loadBackgroundFromUrl()
+
         // Garaj servisini başlat
         startGarajService()
-    }
-    override fun setupNavigation() {
-        val navigationView = findViewById<NavigationView>(R.id.navigation_view)
-        val drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
-
-        if (toolbar == null || drawerLayout == null) {
-            println("❌ Toolbar veya DrawerLayout bulunamadı")
-            return
-        }
-
-        // Toolbar'ı ayarla
-        setSupportActionBar(toolbar)
-
-        // HAMBURGER İKONU İÇİN ÖNEMLİ: Display options'ı sıfırla
-        supportActionBar?.setDisplayHomeAsUpEnabled(false) // Önce kapat
-        supportActionBar?.setDisplayShowHomeEnabled(true)
-        supportActionBar?.setHomeButtonEnabled(true)
-
-        // ActionBarDrawerToggle oluştur - HAMBURGER İÇİN
-        val toggle = ActionBarDrawerToggle(
-            this,
-            drawerLayout,
-            toolbar,
-            R.string.navigation_drawer_open,
-            R.string.navigation_drawer_close
-        )
-
-        drawerLayout.addDrawerListener(toggle)
-        toggle.syncState() // BU ÇOK ÖNEMLİ!
-
-        // Hamburger ikonunu zorla göster
-        toggle.drawerArrowDrawable.color = resources.getColor(android.R.color.white, null)
-
-        // Başlık ayarla
-        supportActionBar?.title = "Dashboard"
-
-        println("✅ Hamburger ikonu ayarlandı")
-
-        // Navigation listener - BaseActivity'den geliyor
-        navigationView?.setNavigationItemSelectedListener(this)
-
-        // Header bilgilerini güncelle
-        val headerView = navigationView?.getHeaderView(0)
-        headerView?.let {
-            val tvUserName = it.findViewById<TextView>(R.id.tvUserName)
-            val tvUserEmail = it.findViewById<TextView>(R.id.tvUserEmail)
-
-            tvUserName.text = userName
-            tvUserEmail.text = userEmail
-        }
     }
 
     private fun startGarajService() {
@@ -221,6 +173,7 @@ class DashboardActivity : BaseActivity() {
         btnGarajAc = findViewById(R.id.btnGarajAc)
         drawerLayout = findViewById(R.id.drawer_layout)
         navigationView = findViewById(R.id.navigation_view)
+        backgroundImage = findViewById(R.id.backgroundImage)
 
         // Bottom navigation butonları
         btnNavDashboard = findViewById(R.id.btnNavDashboard)
@@ -239,6 +192,8 @@ class DashboardActivity : BaseActivity() {
         // Yenile butonu
         btnRefresh.setOnClickListener {
             loadDashboardData()
+            // Profil resmini de yenile
+            refreshProfileImage()
         }
 
         // Fused Location Client'ı başlat
@@ -430,7 +385,7 @@ class DashboardActivity : BaseActivity() {
         updateLocationSpeedStatus()
 
         println("✅ Konum takibi başlatıldı - Hız: ${getLocationSpeed()}")
-        println("🔧 Otomatik garaj açma: ${if (isAutoGarageEnabled()) "AKTİF" else "PAPASİF"}")
+        println("🔧 Otomatik garaj açma: ${if (isAutoGarageEnabled()) "AKTİF" else "PASİF"}")
     }
 
     private fun createLocationRequest(): LocationRequest {
@@ -653,7 +608,6 @@ class DashboardActivity : BaseActivity() {
         }
     }
 
-    // playSoundAndVibration metodunu SİLİYORUZ, gerek yok
     private fun startButtonAnimations() {
         try {
             val shakeAnim = AnimationUtils.loadAnimation(this, R.anim.shake)
@@ -680,6 +634,7 @@ class DashboardActivity : BaseActivity() {
             println("❌ Animasyon hatası: ${e.message}")
         }
     }
+
     private fun playSoundAndVibration() {
         try {
             // Titreşim efekti
@@ -700,6 +655,7 @@ class DashboardActivity : BaseActivity() {
             println("❌ Titreşim/ses hatası: ${e.message}")
         }
     }
+
     private fun garajAcAPIistegiGonder() {
         playSoundAndVibration()
         val blynkToken = getBlynkToken()
@@ -842,7 +798,12 @@ class DashboardActivity : BaseActivity() {
         }
 
         btnBakim.setOnClickListener {
-            Toast.makeText(this, "Bakım talepleri yakında eklenecek", Toast.LENGTH_SHORT).show()
+            // Buton Durum Activity'sine git
+            startActivity(Intent(this, ButonDurumActivity::class.java).apply {
+                putExtra("user_email", userEmail)
+                putExtra("user_type", userType)
+                putExtra("user_name", userName)
+            })
         }
 
         btnSikayetler.setOnClickListener {
@@ -950,47 +911,6 @@ class DashboardActivity : BaseActivity() {
         }
     }
 
-    // GroupedDuesActivity'deki gibi gecikmiş verileri hesapla
-    private fun calculateOverdueFromGroups(data: JSONObject) {
-        try {
-            var totalOverdueCount = 0
-            var totalOverdueAmount = 0.0
-
-            // groups array'ini kontrol et
-            if (data.has("groups")) {
-                val groupsArray = data.getJSONArray("groups")
-                for (i in 0 until groupsArray.length()) {
-                    val group = groupsArray.getJSONObject(i)
-                    if (group.has("overdue_count")) {
-                        totalOverdueCount += group.getInt("overdue_count")
-                    }
-                    if (group.has("total_overdue")) {
-                        totalOverdueAmount += group.getDouble("total_overdue")
-                    }
-                }
-            }
-
-            // statistics objesini kontrol et
-            if (data.has("statistics")) {
-                val stats = data.getJSONObject("statistics")
-                if (stats.has("total_overdue_count")) {
-                    totalOverdueCount = stats.getInt("total_overdue_count")
-                }
-                if (stats.has("total_overdue_amount")) {
-                    totalOverdueAmount = stats.getDouble("total_overdue_amount")
-                }
-            }
-
-            tvOverdueDues.text = totalOverdueCount.toString()
-            tvTotalLateFees.text = "₺${String.format("%.2f", totalOverdueAmount)}"
-
-        } catch (e: Exception) {
-            println("❌ Gruplardan gecikme hesaplama hatası: ${e.message}")
-            tvOverdueDues.text = "0"
-            tvTotalLateFees.text = "₺0.00"
-        }
-    }
-
     private fun showPlaceholderData() {
         tvTotalUsers.text = "-"
         tvTotalDues.text = "-"
@@ -1000,24 +920,45 @@ class DashboardActivity : BaseActivity() {
         tvTotalLateFees.text = "-"
     }
 
+    private fun loadBackgroundFromUrl() {
+        Thread {
+            try {
+                val url = URL("https://baser.free.nf/apartman/arkaplan.jpg")
+                val connection = url.openConnection() as HttpsURLConnection
+                connection.connect()
+
+                if (connection.responseCode == 200) {
+                    val inputStream = connection.inputStream
+                    val bitmap = BitmapFactory.decodeStream(inputStream)
+                    inputStream.close()
+
+                    runOnUiThread {
+                        backgroundImage.setImageBitmap(bitmap)
+                    }
+                    println("✅ Arkaplan resmi başarıyla yüklendi")
+                } else {
+                    println("❌ Arkaplan yükleme hatası: HTTP ${connection.responseCode}")
+                    runOnUiThread {
+                        backgroundImage.setBackgroundColor(Color.parseColor("#f5f7fa"))
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                println("❌ Arkaplan yükleme hatası: ${e.message}")
+                runOnUiThread {
+                    backgroundImage.setBackgroundColor(Color.parseColor("#f5f7fa"))
+                }
+            }
+        }.start()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         stopLocationTracking()
         // Servisi durdurmuyoruz, arkaplanda çalışmaya devam etsin
     }
 
-    override fun onPause() {
-        super.onPause()
-        // Arkaplanda çalışması için tracking durdurulmuyor
-        // Servis zaten arkaplanda çalışıyor
-    }
 
-    override fun onResume() {
-        super.onResume()
-        if (!isTracking && hasLocationPermission()) {
-            startLocationTracking()
-        }
-    }
 
     private fun hasLocationPermission(): Boolean {
         return ContextCompat.checkSelfPermission(

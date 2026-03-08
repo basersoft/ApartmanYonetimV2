@@ -10,7 +10,7 @@ import java.net.URLEncoder
 
 object NetworkUtils {
 
-    private const val BASE_URL = "http://baser.org/apartman/"
+    private const val BASE_URL = "http://baser.org/site/"
     private const val TIMEOUT = 15000
 
     fun makePostRequest(

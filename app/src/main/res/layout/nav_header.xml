@@ -2,37 +2,73 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="180dp"
-    android:background="@color/black"
+    android:layout_height="200dp"
+    android:background="#4361ee"
     android:orientation="vertical"
-    android:padding="16dp"
+    android:padding="20dp"
+    android:gravity="center_horizontal"
     android:theme="@style/ThemeOverlay.MaterialComponents.Dark">
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_marginTop="8dp"
-        android:src="@android:drawable/ic_menu_myplaces"
-        app:tint="@android:color/white" />
+    <!-- Profil Resmi Container -->
+    <RelativeLayout
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginBottom="16dp">
 
+        <!-- Profil Resmi - ImageView -->
+        <ImageView
+            android:id="@+id/ivProfileImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_profile_placeholder"
+            android:contentDescription="Profil resmi"
+            android:background="@drawable/circle_background" />
+
+        <!-- Kamera ikonu - ImageView -->
+        <ImageView
+            android:id="@+id/ivCameraIcon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignBottom="@id/ivProfileImage"
+            android:layout_alignEnd="@id/ivProfileImage"
+            android:background="@drawable/circle_accent"
+            android:padding="6dp"
+            android:src="@drawable/ic_camera"
+            android:visibility="visible"
+            android:contentDescription="Resim değiştir" />
+    </RelativeLayout>
+
+    <!-- Kullanıcı Adı -->
     <TextView
         android:id="@+id/tvUserName"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:text="Kullanıcı Adı"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textColor="@android:color/white"
         android:textSize="18sp"
-        android:textStyle="bold" />
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        android:gravity="center" />
 
+    <!-- Kullanıcı Email -->
     <TextView
         android:id="@+id/tvUserEmail"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="email@example.com"
-        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-        android:textColor="@android:color/white" />
+        android:textSize="14sp"
+        android:textColor="@android:color/white"
+        android:gravity="center" />
+
+    <!-- Resim Değiştir Butonu - Button -->
+    <Button
+        android:id="@+id/btnChangeProfileImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:background="@android:color/transparent"
+        android:text="Resim Değiştir"
+        android:textColor="@android:color/white"
+        android:textSize="12sp" />
 
 </LinearLayout>
