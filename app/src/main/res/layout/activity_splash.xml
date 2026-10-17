@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#1A237E">
+
+    <!-- Duyuru Resmi -->
+    <ImageView
+        android:id="@+id/splashImage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/splash_image" />
+
+    <!-- Gradient Overlay -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/gradient_overlay" />
+
+    <!-- Duyuru İçeriği -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:background="@drawable/splash_content_bg">
+
+        <!-- Öncelik Göstergesi -->
+        <View
+            android:id="@+id/priorityIndicator"
+            android:layout_width="60dp"
+            android:layout_height="4dp"
+            android:layout_marginBottom="16dp"
+            android:background="#4CAF50" />
+
+        <!-- Başlık -->
+        <TextView
+            android:id="@+id/tvSplashTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hoşgeldiniz"
+            android:textSize="28sp"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-medium" />
+
+        <!-- Mesaj -->
+        <TextView
+            android:id="@+id/tvSplashMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Apartman Yönetim Sistemine Hoşgeldiniz"
+            android:textSize="16sp"
+            android:textColor="#E0E0E0"
+            android:layout_marginTop="8dp"
+            android:lineSpacingExtra="4dp" />
+
+        <!-- Tarih -->
+        <TextView
+            android:id="@+id/tvSplashDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="14sp"
+            android:textColor="#B0B0B0"
+            android:layout_marginTop="12dp" />
+
+    </LinearLayout>
+
+    <!-- App Logo -->
+    <ImageView
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_gravity="center"
+        android:src="@mipmap/ic_launcher"
+        android:elevation="8dp" />
+
+</FrameLayout>

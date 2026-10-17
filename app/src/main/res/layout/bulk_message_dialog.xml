@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Alıcılar -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Alıcılar:"
+        android:layout_marginBottom="8dp"
+        android:textSize="14sp" />
+
+    <RadioGroup
+        android:id="@+id/rgReceiverType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="16dp">
+
+        <RadioButton
+            android:id="@+id/rbAllResidents"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tüm Sakinler" />
+
+        <RadioButton
+            android:id="@+id/rbBlockBased"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Blok Bazlı" />
+
+    </RadioGroup>
+
+    <!-- Blok (gizli) -->
+    <LinearLayout
+        android:id="@+id/llBlock"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="16dp"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Blok:"
+            android:layout_marginBottom="4dp"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/etBlock"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:background="#FFFFFF"
+            android:textColor="#000000" />
+    </LinearLayout>
+
+    <!-- Konu -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Konu:"
+        android:layout_marginBottom="4dp"
+        android:textSize="14sp" />
+
+    <EditText
+        android:id="@+id/etSubject"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:padding="12dp"
+        android:background="#FFFFFF"
+        android:textColor="#000000" />
+
+    <!-- Mesaj -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mesaj:"
+        android:layout_marginBottom="4dp"
+        android:textSize="14sp" />
+
+    <EditText
+        android:id="@+id/etMessage"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:layout_marginBottom="24dp"
+        android:padding="12dp"
+        android:background="#FFFFFF"
+        android:textColor="#000000"
+        android:gravity="top" />
+
+    <!-- Butonlar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end">
+
+        <Button
+            android:id="@+id/btnCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="İptal"
+            android:background="#F0F0F0"
+            android:textColor="#333333"
+            android:padding="12dp" />
+
+        <Button
+            android:id="@+id/btnSend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Toplu Gönder"
+            android:background="#2196F3"
+            android:textColor="#FFFFFF"
+            android:padding="12dp"
+            android:layout_marginStart="8dp" />
+
+    </LinearLayout>
+
+</LinearLayout>

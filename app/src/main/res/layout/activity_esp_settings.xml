@@ -1,0 +1,439 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.drawerlayout.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".EspSettingsActivity">
+
+    <!-- ANA İÇERİK -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="#f0f8ff">
+
+        <!-- TOOLBAR -->
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="#3498db"
+            android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            app:title="🔧 ESP Ayarlar" />
+
+        <!-- SCROLLVIEW İÇERİK -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/background"
+            android:fillViewport="true"
+            android:padding="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- ESP AYAR MENÜSÜ KONTROLÜ -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@drawable/card_background"
+                    android:padding="16dp"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="ESP Ayar Menüsü Kontrolü"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/primary"
+                        android:layout_marginBottom="12dp"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="ESP'deki ayar menüsünü kontrol edin. Önce 'ESP Menüye Gir' ile menüye girin, sonra ayarları değiştirin."
+                        android:textSize="12sp"
+                        android:textColor="@color/text_secondary"
+                        android:layout_marginBottom="16dp"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="8dp">
+
+                        <Button
+                            android:id="@+id/btnEspEnterMenu"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="8dp"
+                            android:text="ESP Menüye Gir"
+                            android:backgroundTint="@color/green"
+                            android:textColor="@android:color/white"/>
+
+                        <Button
+                            android:id="@+id/btnEspExitMenu"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="8dp"
+                            android:text="Menüden Çık"
+                            android:backgroundTint="@color/red"
+                            android:textColor="@android:color/white"/>
+                    </LinearLayout>
+
+                    <Button
+                        android:id="@+id/btnEspNextItem"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Sonraki Menü Öğesi"
+                        android:backgroundTint="@color/blue"
+                        android:textColor="@android:color/white"
+                        android:layout_marginBottom="8dp"/>
+
+                    <Button
+                        android:id="@+id/btnEspExecute"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Seçimi Onayla (EVET)"
+                        android:backgroundTint="@color/orange"
+                        android:textColor="@android:color/white"
+                        android:layout_marginBottom="8dp"/>
+
+                    <TextView
+                        android:id="@+id/tvEspMenuStatus"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Menü durumu: Hazır"
+                        android:textSize="12sp"
+                        android:textColor="@color/text_secondary"
+                        android:gravity="center"
+                        android:padding="8dp"
+                        android:background="@color/cardview_light_background"/>
+                </LinearLayout>
+
+                <!-- DOĞRUDAN AYARLAR -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@drawable/card_background"
+                    android:padding="16dp"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Doğrudan Ayarlar"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/primary"
+                        android:layout_marginBottom="12dp"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Bu ayarlar direkt olarak ESP'nin EEPROM'una kaydedilir."
+                        android:textSize="12sp"
+                        android:textColor="@color/text_secondary"
+                        android:layout_marginBottom="16dp"/>
+
+                    <!-- SICAKLIK DÜZELTME -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginBottom="16dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Sıcaklık Düzeltme"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_secondary"
+                            android:layout_marginBottom="8dp"/>
+
+                        <SeekBar
+                            android:id="@+id/sbTempCorrection"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:max="10"
+                            android:progress="5"
+                            android:progressTint="@color/blue"/>
+
+                        <TextView
+                            android:id="@+id/tvTempCorrection"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Düzeltme: 0°C"
+                            android:textSize="12sp"
+                            android:textColor="@color/primary"
+                            android:gravity="center"/>
+                    </LinearLayout>
+
+                    <!-- HYSTERESIS AYARI -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginBottom="16dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Histerezis Değeri"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_secondary"
+                            android:layout_marginBottom="8dp"/>
+
+                        <SeekBar
+                            android:id="@+id/sbHysteresis"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:max="5"
+                            android:progress="2"
+                            android:progressTint="@color/green"/>
+
+                        <TextView
+                            android:id="@+id/tvHysteresis"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Histerezis: 2°C"
+                            android:textSize="12sp"
+                            android:textColor="@color/primary"
+                            android:gravity="center"/>
+                    </LinearLayout>
+
+                    <!-- MİNİMUM/MAKSİMUM SICAKLIK -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="16dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginEnd="8dp">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Min Sıcaklık"
+                                android:textSize="14sp"
+                                android:textColor="@color/text_secondary"
+                                android:layout_marginBottom="8dp"/>
+
+                            <SeekBar
+                                android:id="@+id/sbMinTemp"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:max="15"
+                                android:progress="10"
+                                android:progressTint="@color/blue"/>
+
+                            <TextView
+                                android:id="@+id/tvMinTemp"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Min: 10°C"
+                                android:textSize="12sp"
+                                android:textColor="@color/primary"
+                                android:gravity="center"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="8dp">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Max Sıcaklık"
+                                android:textSize="14sp"
+                                android:textColor="@color/text_secondary"
+                                android:layout_marginBottom="8dp"/>
+
+                            <SeekBar
+                                android:id="@+id/sbMaxTemp"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:max="20"
+                                android:progress="12"
+                                android:progressTint="@color/red"/>
+
+                            <TextView
+                                android:id="@+id/tvMaxTemp"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Max: 32°C"
+                                android:textSize="12sp"
+                                android:textColor="@color/primary"
+                                android:gravity="center"/>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- ANAHTAR AYARLARI -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Diğer Ayarlar"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_secondary"
+                            android:layout_marginBottom="12dp"/>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="8dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Algılanan Sıcaklık"
+                                android:textSize="12sp"
+                                android:textColor="@color/text_secondary"/>
+
+                            <Switch
+                                android:id="@+id/switchPerceivedTemp"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="8dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Home Assistant"
+                                android:textSize="12sp"
+                                android:textColor="@color/text_secondary"/>
+
+                            <Switch
+                                android:id="@+id/switchHomeAssistant"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="8dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Ekran Durumu"
+                                android:textSize="12sp"
+                                android:textColor="@color/text_secondary"/>
+
+                            <Switch
+                                android:id="@+id/switchScreenState"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Kış/Yaz Modu"
+                                android:textSize="12sp"
+                                android:textColor="@color/text_secondary"/>
+
+                            <Switch
+                                android:id="@+id/switchWinterMode"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- KAYDET BUTONU -->
+                    <Button
+                        android:id="@+id/btnSaveSettings"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="AYARLARI KAYDET"
+                        android:backgroundTint="@color/green"
+                        android:textColor="@android:color/white"
+                        android:layout_marginTop="16dp"/>
+
+                </LinearLayout>
+
+                <!-- ESP DURUM BİLGİSİ -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@drawable/card_background"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="ESP Durum Bilgisi"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/primary"
+                        android:layout_marginBottom="12dp"/>
+
+                    <TextView
+                        android:id="@+id/tvEspInfo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="ESP bağlantısı bekleniyor..."
+                        android:textSize="12sp"
+                        android:textColor="@color/text_secondary"
+                        android:lineSpacingExtra="4dp"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </ScrollView>
+
+    </LinearLayout>
+
+    <!-- SOL MENÜ -->
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/navigation_view"
+        android:layout_width="280dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="@android:color/white"
+        app:headerLayout="@layout/nav_header"
+        app:menu="@menu/navigation_drawer_menu" />
+
+</androidx.drawerlayout.widget.DrawerLayout>

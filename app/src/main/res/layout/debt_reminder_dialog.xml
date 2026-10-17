@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="400dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Hatırlatma Türü -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hatırlatma Türü:"
+            android:layout_marginBottom="8dp"
+            android:textSize="14sp" />
+
+        <RadioGroup
+            android:id="@+id/rgReminderType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="16dp">
+
+            <RadioButton
+                android:id="@+id/rbSingleUser"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tek Kullanıcı"
+                android:layout_marginBottom="8dp" />
+
+            <RadioButton
+                android:id="@+id/rbBulkReminder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Toplu Hatırlatma" />
+
+        </RadioGroup>
+
+        <!-- Tek Kullanıcı (göster) -->
+        <LinearLayout
+            android:id="@+id/llSingleUser"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Borçlu:"
+                android:layout_marginBottom="4dp"
+                android:textSize="14sp" />
+
+            <EditText
+                android:id="@+id/etDebtor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                android:background="#FFFFFF"
+                android:textColor="#000000" />
+        </LinearLayout>
+
+        <!-- Toplu (gizli) -->
+        <LinearLayout
+            android:id="@+id/llBulkReminder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Gönderilecekler:"
+                android:layout_marginBottom="8dp"
+                android:textSize="14sp" />
+
+            <RadioGroup
+                android:id="@+id/rgDebtType"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <RadioButton
+                    android:id="@+id/rbAllDebtors"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tüm Borçlular"
+                    android:layout_marginBottom="8dp" />
+
+                <RadioButton
+                    android:id="@+id/rbOverdue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Gecikmiş Borçlular"
+                    android:layout_marginBottom="8dp" />
+
+                <RadioButton
+                    android:id="@+id/rbPending"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Bekleyen Borçlular" />
+
+            </RadioGroup>
+        </LinearLayout>
+
+        <!-- Konu -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Konu:"
+            android:layout_marginBottom="4dp"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/etSubject"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:padding="12dp"
+            android:background="#FFFFFF"
+            android:textColor="#000000"
+            android:text="Borç Hatırlatma" />
+
+        <!-- Mesaj -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mesaj:"
+            android:layout_marginBottom="4dp"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/etMessage"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:layout_marginBottom="24dp"
+            android:padding="12dp"
+            android:background="#FFFFFF"
+            android:textColor="#000000"
+            android:gravity="top"
+            android:text="Sayın Apartman Sakini,
+
+Ödenmemiş aidat ve giderleriniz hakkında bilgilendirme mesajıdır.
+
+Borç detayları aşağıda özetlenmiştir. Lütfen en kısa sürede ödemelerinizi tamamlayınız.
+
+Teşekkür ederiz." />
+
+        <!-- Butonlar -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end">
+
+            <Button
+                android:id="@+id/btnCancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="İptal"
+                android:background="#F0F0F0"
+                android:textColor="#333333"
+                android:padding="12dp" />
+
+            <Button
+                android:id="@+id/btnSend"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hatırlatma Gönder"
+                android:background="#FF9800"
+                android:textColor="#FFFFFF"
+                android:padding="12dp"
+                android:layout_marginStart="8dp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

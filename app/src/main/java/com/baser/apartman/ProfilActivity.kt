@@ -1,20 +1,10 @@
 package com.baser.apartman
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffXfermode
-import android.graphics.Rect
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.navigation.NavigationView
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -38,51 +28,13 @@ class ProfilActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profil)
 
-        // ApiManager'ı başlat
         ApiManager.initialize(this)
 
-        // Önce BaseActivity'deki setupNavigation'ı çağır
+        // BaseActivity'deki navigation'ı kur
         super.setupNavigation()
 
-        // Sonra kendi toolbar ayarlarımızı yap
-        setupToolbar()
-
-        // View'ları bağla
         setupViews()
-
-        // Kullanıcı profilini yükle
         loadUserProfile()
-    }
-
-    private fun setupToolbar() {
-        val drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
-        val toolbar = findViewById<MaterialToolbar>(R.id.toolbar)
-
-        if (toolbar == null || drawerLayout == null) {
-            println("❌ Toolbar veya DrawerLayout bulunamadı")
-            return
-        }
-
-        // Toolbar'ı ayarla
-        setSupportActionBar(toolbar)
-        supportActionBar?.title = "Profilim"
-
-        // Hamburger ikonu için ActionBarDrawerToggle oluştur
-        val toggle = ActionBarDrawerToggle(
-            this,
-            drawerLayout,
-            toolbar,
-            R.string.navigation_drawer_open,
-            R.string.navigation_drawer_close
-        )
-
-        drawerLayout.addDrawerListener(toggle)
-        toggle.syncState()
-
-        // Hamburger ikonunu beyaz yap
-        toggle.drawerArrowDrawable.color = resources.getColor(android.R.color.white, null)
-
-        println("✅ ProfilActivity: Toolbar ayarlandı")
     }
 
     private fun setupViews() {
@@ -100,11 +52,9 @@ class ProfilActivity : BaseActivity() {
         tvTarihFormatli = findViewById(R.id.tvTarihFormatli)
         tvHatirlatici = findViewById(R.id.tvHatirlatici)
 
-        // Başlangıç değerlerini ayarla
         tvAdSoyad.text = userName
         tvEmail.text = userEmail
 
-        // SADECE ProfileImageManager kullan
         ProfileImageManager.loadProfileImage(this, userEmail, ivProfilResmi)
     }
 
@@ -126,16 +76,11 @@ class ProfilActivity : BaseActivity() {
 
     private fun parseUserProfile(csvResponse: String) {
         try {
-            println("🔍 CSV Yanıtı işleniyor...")
-
             val lines = csvResponse.trim().split("\n")
-            println("🔍 Satır sayısı: ${lines.size}")
-
             if (lines.size > 1) {
                 val headers = lines[0].split(",")
                 val userData = lines[1].split(",")
 
-                // CSV'den verileri al
                 val userMap = mutableMapOf<String, String>()
                 for (i in headers.indices) {
                     if (i < userData.size) {
@@ -143,22 +88,13 @@ class ProfilActivity : BaseActivity() {
                     }
                 }
 
-                println("🔍 User Map: $userMap")
-
-                // Profil resmi URL'sini al
-                val profileImage = userMap["profile_image"]
-                println("🔍 Profil Resmi URL: $profileImage")
-
-                // UI'ı güncelle
                 runOnUiThread {
-                    // Temel bilgiler
                     tvAdSoyad.text = userMap["name"] ?: userName
                     tvEmail.text = userMap["email"] ?: userEmail
                     tvTelefon.text = userMap["phone"] ?: "Belirtilmemiş"
                     tvBlok.text = userMap["apartment_block"] ?: "Belirtilmemiş"
                     tvDaireNo.text = userMap["apartment_number"] ?: "Belirtilmemiş"
 
-                    // Kullanıcı tipi
                     val userTypeFromDB = userMap["user_type"] ?: userType
                     tvKullaniciTipi.text = when (userTypeFromDB) {
                         "admin" -> "Yönetici"
@@ -167,83 +103,43 @@ class ProfilActivity : BaseActivity() {
                         else -> userTypeFromDB
                     }
 
-                    // Sakin tipi
-                    val residentType = userMap["resident_type"] ?: "owner"
-                    tvSakinTipi.text = when (residentType) {
+                    tvSakinTipi.text = when (userMap["resident_type"]) {
                         "owner" -> "Ev Sahibi"
                         "tenant" -> "Kiracı"
-                        else -> residentType
+                        else -> "Belirtilmemiş"
                     }
 
-                    // Aidat sorumluluğu
-                    val aidatSorumlu = userMap["is_responsible_for_dues"] ?: "yes"
-                    tvAidatSorumlu.text = when (aidatSorumlu) {
+                    tvAidatSorumlu.text = when (userMap["is_responsible_for_dues"]) {
                         "yes" -> "Evet"
                         "no" -> "Hayır"
-                        else -> aidatSorumlu
+                        else -> "Belirtilmemiş"
                     }
 
-                    // İkamet durumu
-                    val ikametDurumu = userMap["is_residing"] ?: "yes"
-                    tvIkametDurumu.text = when (ikametDurumu) {
+                    tvIkametDurumu.text = when (userMap["is_residing"]) {
                         "yes" -> "Evet"
                         "no" -> "Hayır"
-                        else -> ikametDurumu
+                        else -> "Belirtilmemiş"
                     }
 
-                    // Hatırlatıcılar
-                    val hatirlatici = userMap["receive_reminders"] ?: "yes"
-                    tvHatirlatici.text = when (hatirlatici) {
+                    tvHatirlatici.text = when (userMap["receive_reminders"]) {
                         "yes" -> "Evet"
                         "no" -> "Hayır"
-                        else -> hatirlatici
+                        else -> "Belirtilmemiş"
                     }
 
-                    // Tarih bilgileri
                     val kayitTarihi = userMap["created_at"] ?: ""
                     tvKayitTarihi.text = kayitTarihi.ifEmpty { "Belirtilmemiş" }
-
-                    // Formatlı tarih
                     tvTarihFormatli.text = formatDate(kayitTarihi)
 
-                    // ProfileImageManager ile resmi yükle (yeniden yükleme yapmaz, sadece cache'te yoksa yükler)
                     ProfileImageManager.loadProfileImage(this@ProfilActivity, userEmail, ivProfilResmi)
 
                     Toast.makeText(this, "Profil bilgileri güncellendi", Toast.LENGTH_SHORT).show()
                 }
-
-                println("✅ Profil bilgileri yüklendi")
             } else {
-                println("❌ Kullanıcı bulunamadı veya yetersiz veri")
                 showDefaultProfile()
             }
         } catch (e: Exception) {
-            println("❌ Profil ayrıştırma hatası: ${e.message}")
-            e.printStackTrace()
             showDefaultProfile()
-        }
-    }
-
-    private fun getRoundedBitmap(bitmap: Bitmap): Bitmap {
-        val size = minOf(bitmap.width, bitmap.height)
-        val output = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(output)
-        val paint = Paint()
-        val rect = Rect(0, 0, size, size)
-
-        paint.isAntiAlias = true
-        canvas.drawARGB(0, 0, 0, 0)
-        canvas.drawCircle(size / 2f, size / 2f, size / 2f, paint)
-        paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
-        canvas.drawBitmap(bitmap, rect, rect, paint)
-
-        return output
-    }
-
-    private fun loadDefaultProfileImage() {
-        runOnUiThread {
-            ivProfilResmi.setImageResource(R.drawable.ic_profile_placeholder)
-            ivProfilResmi.background = resources.getDrawable(R.drawable.circle_background, null)
         }
     }
 
@@ -269,22 +165,26 @@ class ProfilActivity : BaseActivity() {
             tvTelefon.text = "Bulunamadı"
             tvBlok.text = "Bulunamadı"
             tvDaireNo.text = "Bulunamadı"
-
             tvKullaniciTipi.text = when (userType) {
                 "admin" -> "Yönetici"
                 "manager" -> "Site Sorumlusu"
                 "resident" -> "Sakin"
                 else -> userType
             }
-
             tvSakinTipi.text = "Bulunamadı"
             tvAidatSorumlu.text = "Bulunamadı"
             tvIkametDurumu.text = "Bulunamadı"
             tvKayitTarihi.text = "Bulunamadı"
             tvTarihFormatli.text = "Bulunamadı"
             tvHatirlatici.text = "Bulunamadı"
-
             loadDefaultProfileImage()
+        }
+    }
+
+    private fun loadDefaultProfileImage() {
+        runOnUiThread {
+            ivProfilResmi.setImageResource(R.drawable.ic_profile_placeholder)
+            ivProfilResmi.background = resources.getDrawable(R.drawable.circle_background, null)
         }
     }
 
