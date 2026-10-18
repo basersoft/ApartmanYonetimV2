@@ -47,64 +47,16 @@ class SettingsActivity : BaseActivity() {
         // SharedPreferences başlat
         prefs = getSharedPreferences("ApartmanPrefs", MODE_PRIVATE)
 
-        setupNavigation()
+        // BaseActivity'nin setupNavigation'ını çağır
+        super.setupNavigation()
+
+        // Toolbar başlığını değiştir
+        supportActionBar?.title = "Ayarlar"
+
         initViews()
         setupLocationSpeedSpinner()
         setupAutoGarageSwitch()
         loadSettings()
-    }
-
-    // Navigation'ı BaseActivity'den override et
-    override fun setupNavigation() {
-        val navigationView = findViewById<NavigationView>(R.id.navigation_view)
-        val drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
-        val toolbar = findViewById<MaterialToolbar>(R.id.toolbar)
-
-        if (toolbar == null || drawerLayout == null) {
-            println("❌ Toolbar veya DrawerLayout bulunamadı")
-            return
-        }
-
-        // Toolbar'ı ayarla
-        setSupportActionBar(toolbar)
-
-        // HAMBURGER İKONU İÇİN ÖNEMLİ: Display options'ı sıfırla
-        supportActionBar?.setDisplayHomeAsUpEnabled(false) // Önce kapat
-        supportActionBar?.setDisplayShowHomeEnabled(true)
-        supportActionBar?.setHomeButtonEnabled(true)
-
-        // ActionBarDrawerToggle oluştur - HAMBURGER İÇİN
-        val toggle = ActionBarDrawerToggle(
-            this,
-            drawerLayout,
-            toolbar,
-            R.string.navigation_drawer_open,
-            R.string.navigation_drawer_close
-        )
-
-        drawerLayout.addDrawerListener(toggle)
-        toggle.syncState() // BU ÇOK ÖNEMLİ!
-
-        // Hamburger ikonunu zorla göster
-        toggle.drawerArrowDrawable.color = resources.getColor(android.R.color.white, null)
-
-        // Başlık ayarla
-        supportActionBar?.title = "Ayarlar"
-
-        println("✅ Hamburger ikonu ayarlandı")
-
-        // Navigation listener
-        navigationView?.setNavigationItemSelectedListener(this)
-
-        // Header bilgilerini güncelle
-        val headerView = navigationView?.getHeaderView(0)
-        headerView?.let {
-            val tvUserName = it.findViewById<TextView>(R.id.tvUserName)
-            val tvUserEmail = it.findViewById<TextView>(R.id.tvUserEmail)
-
-            tvUserName.text = userName
-            tvUserEmail.text = userEmail
-        }
     }
 
     private fun initViews() {
@@ -126,7 +78,7 @@ class SettingsActivity : BaseActivity() {
             saveSettings()
         }
 
-        // Geri butonu - artık drawer'ı kapatacak
+        // Geri butonu
         btnBack.setOnClickListener {
             onBackPressed()
         }

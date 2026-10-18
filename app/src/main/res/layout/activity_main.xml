@@ -51,6 +51,35 @@
             android:textStyle="bold"
             android:textColor="#333333"
             android:layout_marginBottom="32dp"/>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="16dp">
+
+        <TextView
+            android:id="@+id/tvForgotPassword"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Şifremi Unuttum"
+            android:textColor="@color/primary_color"
+            android:textSize="14sp"
+            android:padding="8dp"/>
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="16dp"
+            android:background="@color/gray"
+            android:layout_marginHorizontal="8dp"/>
+
+        <TextView
+            android:id="@+id/tvRegister"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Yeni Kayıt Ol"
+            android:textColor="@color/primary_color"
+            android:textSize="14sp"
+            android:padding="8dp"/>
 
         <!-- E-posta Giriş Alanı -->
         <com.google.android.material.textfield.TextInputLayout

@@ -9,6 +9,7 @@ import android.content.Intent
 import android.widget.RemoteViews
 import com.baser.apartman.MainActivity
 import com.baser.apartman.R
+import com.baser.apartman.WeatherActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -43,7 +44,7 @@ class WeatherAppWidget : AppWidgetProvider() {
         val views = RemoteViews(context.packageName, R.layout.widget_weather_app)
 
         // Tıklanınca uygulamayı aç
-        val intent = Intent(context, MainActivity::class.java)
+        val intent = Intent(context, WeatherActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(
             context, 0, intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE

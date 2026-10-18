@@ -1,3 +1,4 @@
+<!-- res/values/themes.xml -->
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.ApartmanYonetim" parent="Theme.Material3.DayNight.NoActionBar">
@@ -7,10 +8,18 @@
         <item name="colorPrimaryContainer">@color/purple_200</item>
         <item name="colorOnPrimaryContainer">@color/purple_700</item>
 
+        <!-- Material Components compatibility -->
+        <item name="materialButtonStyle">@style/Widget.MaterialComponents.Button</item>
+
         <!-- Status bar -->
         <item name="android:statusBarColor">?attr/colorPrimary</item>
         <item name="android:navigationBarColor">?attr/colorPrimary</item>
     </style>
 
     <style name="Theme.ApartmanYonetim" parent="Base.Theme.ApartmanYonetim" />
+
+    <!-- Bridge theme for Material Components -->
+    <style name="ThemeOverlay.Apartman.MaterialComponents" parent="">
+        <item name="materialButtonStyle">@style/Widget.MaterialComponents.Button</item>
+    </style>
 </resources>

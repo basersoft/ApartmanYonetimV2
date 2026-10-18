@@ -6,7 +6,7 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 
-class ApiSettingsActivity : AppCompatActivity() {
+class ApiSettingsActivity : BaseActivity() { // BaseActivity'den extend edin
 
     private lateinit var etBaseUrl: EditText
     private lateinit var etApiPath: EditText
@@ -22,6 +22,9 @@ class ApiSettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_api_settings)
+
+        // Sol menü ve hamburger icon için
+        setupNavigation()
 
         // ApiManager'ı başlat
         ApiManager.initialize(this)

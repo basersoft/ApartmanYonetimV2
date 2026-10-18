@@ -69,6 +69,27 @@
                 android:padding="12dp"
                 android:layout_marginBottom="16dp" />
 
+            <!-- Şifre (sadece yeni kullanıcıda veya şifre güncellemede gösterilir) -->
+            <TextView
+                android:id="@+id/tvPasswordLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="🔑 Şifre"
+                android:textSize="14sp"
+                android:textColor="#2c3e50"
+                android:textStyle="bold"
+                android:layout_marginBottom="4dp" />
+
+            <EditText
+                android:id="@+id/etPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Şifre (boş bırakılırsa değişmez)"
+                android:inputType="textPassword"
+                android:background="@drawable/edittext_background"
+                android:padding="12dp"
+                android:layout_marginBottom="16dp" />
+
             <!-- Telefon -->
             <TextView
                 android:layout_width="match_parent"
@@ -203,7 +224,44 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/spinner_background"
                 android:padding="12dp"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginBottom="16dp" />
+
+            <!-- Durum (Sadece admin/manager görür) -->
+            <TextView
+                android:id="@+id/tvStatusLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="📊 Durum"
+                android:textSize="14sp"
+                android:textColor="#2c3e50"
+                android:textStyle="bold"
+                android:layout_marginBottom="4dp" />
+
+            <Spinner
+                android:id="@+id/spStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/spinner_background"
+                android:padding="12dp"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Hatırlatıcı Alma -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="🔔 Hatırlatıcı Alma"
+                android:textSize="14sp"
+                android:textColor="#2c3e50"
+                android:textStyle="bold"
+                android:layout_marginBottom="4dp" />
+
+            <Spinner
+                android:id="@+id/spReceiveReminders"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/spinner_background"
+                android:padding="12dp"
+                android:layout_marginBottom="16dp" />
 
         </LinearLayout>
 

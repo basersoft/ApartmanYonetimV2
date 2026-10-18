@@ -1,66 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:id="@+id/nav_dashboard"
-        android:icon="@android:drawable/ic_menu_myplaces"
-        android:title="Ana Sayfa" />
-    <item
-        android:id="@+id/nav_profil"
-        android:icon="@android:drawable/ic_menu_my_calendar"
-        android:title="Profilim" />
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!-- YENİ: Hava Durumu -->
-    <item
-        android:id="@+id/nav_weather"
-        android:icon="@android:drawable/ic_menu_day"
-        android:title="Hava Durumu" />
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_dashboard"
+            android:icon="@android:drawable/ic_menu_myplaces"
+            android:title="Ana Sayfa" />
 
-    <item
-        android:id="@+id/nav_user_management"
-        android:icon="@android:drawable/ic_menu_manage"
-        android:title="Kullanıcı Yönetimi" />
-    <item
-        android:id="@+id/nav_duyurular"
-        android:icon="@android:drawable/ic_menu_agenda"
-        android:title="Duyurular" />
-    <item
-        android:id="@+id/nav_aidat"
-        android:icon="@android:drawable/ic_menu_manage"
-        android:title="Aidat Takibi" />
-    <item
-        android:id="@+id/nav_shared_expenses"
-        android:icon="@android:drawable/ic_menu_save"
-        android:title="Toplu Harcamalar" />
-    <item
-        android:id="@+id/nav_gruplanmis_borclar"
-        android:icon="@android:drawable/ic_menu_sort_by_size"
-        android:title="Gruplanmış Borçlar" />
-    <item
-        android:id="@+id/nav_sikayetler"
-        android:icon="@android:drawable/ic_menu_info_details"
-        android:title="Şikayetler" />
-    <item
-        android:id="@+id/nav_yeni_sikayet"
-        android:icon="@android:drawable/ic_menu_add"
-        android:title="Yeni Şikayet" />
+        <item
+            android:id="@+id/nav_profil"
+            android:icon="@android:drawable/ic_menu_my_calendar"
+            android:title="Profilim" />
 
-    <item
-        android:id="@+id/nav_settings"
-        android:icon="@android:drawable/ic_menu_preferences"
-        android:title="Ayarlar" />
-    <item
-        android:id="@+id/nav_api_settings"
-        android:icon="@android:drawable/ic_menu_preferences"
-        android:title="API Ayarları" />
-    <item
-        android:id="@+id/nav_logout"
-        android:icon="@android:drawable/ic_lock_power_off"
-        android:title="Çıkış Yap" />
+        <item
+            android:id="@+id/nav_weather"
+            android:icon="@android:drawable/ic_menu_day"
+            android:title="Hava Durumu" />
 
-    <!-- COPYRIGHT BİLGİSİ -->
-    <item
-        android:id="@+id/nav_copyright"
-        android:title="© 2025 BaserSoft Apartman Yönetimi"
-        android:enabled="false"
-        android:clickable="false" />
+        <item
+            android:id="@+id/nav_user_management"
+            android:icon="@android:drawable/ic_menu_manage"
+            android:title="Kullanıcı Yönetimi" />
+
+        <item
+            android:id="@+id/nav_duyurular"
+            android:icon="@android:drawable/ic_menu_agenda"
+            android:title="Duyurular" />
+
+        <!-- YENİ: Uyku Modu -->
+        <item
+            android:id="@+id/nav_uyku_modu"
+            android:icon="@drawable/ic_sleep"
+            android:title="Uyku Modu" />
+
+        <item
+            android:id="@+id/nav_aidat"
+            android:icon="@android:drawable/ic_menu_manage"
+            android:title="Aidat Takibi" />
+
+        <item
+            android:id="@+id/nav_shared_expenses"
+            android:icon="@android:drawable/ic_menu_save"
+            android:title="Toplu Harcamalar" />
+
+        <item
+            android:id="@+id/nav_gruplanmis_borclar"
+            android:icon="@android:drawable/ic_menu_sort_by_size"
+            android:title="Gruplanmış Borçlar" />
+
+        <item
+            android:id="@+id/nav_sikayetler"
+            android:icon="@android:drawable/ic_menu_info_details"
+            android:title="Şikayetler" />
+
+        <item
+            android:id="@+id/nav_yeni_sikayet"
+            android:icon="@android:drawable/ic_menu_add"
+            android:title="Yeni Şikayet" />
+
+        <item
+            android:id="@+id/nav_messages"
+            android:icon="@drawable/ic_message"
+            android:title="Mesajlar" />
+
+        <item
+            android:id="@+id/nav_api_settings"
+            android:icon="@android:drawable/ic_menu_preferences"
+            android:title="API Ayarları" />
+
+        <item
+            android:id="@+id/nav_buton_durum"
+            android:icon="@android:drawable/ic_menu_view"
+            android:title="Buton Durum" />
+
+        <item
+            android:id="@+id/nav_kombi"
+            android:icon="@drawable/ic_cloudy"
+            android:title="Kombi Kontrol" />
+
+        <!-- YENİ EKLENEN ESP AYARLAR ITEM'I -->
+        <item
+            android:id="@+id/nav_esp_settings"
+            android:icon="@android:drawable/ic_menu_preferences"
+            android:title="ESP Ayarlar" />
+        <item
+            android:id="@+id/nav_rahatsiz_etme"
+            android:icon="@drawable/ic_sleep"
+            android:title="Rahatsız Etme Modu" />
+        <item
+            android:id="@+id/nav_settings"
+            android:icon="@android:drawable/ic_menu_preferences"
+            android:title="Garaj Ayarlar" />
+        <item
+            android:id="@+id/nav_namaz_vakitleri"
+            android:icon="@drawable/ic_namaz"
+            android:title="Namaz Vakitleri" />
+    </group>
+
+    <!-- Logout ayrı bir grupta -->
+    <group android:id="@+id/group_logout">
+        <item
+            android:id="@+id/nav_logout"
+            android:icon="@android:drawable/ic_lock_power_off"
+            android:title="Çıkış Yap" />
+    </group>
+
+    <!-- Copyright - tıklanamaz -->
+    <group>
+        <item
+            android:id="@+id/nav_copyright"
+            android:title="© 2026 Abdullah BAŞER Apartman Yönetimi"
+            android:enabled="false"
+            android:clickable="false" />
+    </group>
+
 </menu>

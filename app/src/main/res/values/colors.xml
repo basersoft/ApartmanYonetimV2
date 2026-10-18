@@ -10,8 +10,16 @@
     <color name="white">#FFFFFFFF</color>
 
     <!-- Proje özel renkleri -->
-    <color name="primary">#2196F3</color>
-    <color name="primary_dark">#1976D2</color>
+    <!-- Turkuaz Paleti -->
+    <color name="turkuaz_koyu">#118B7E</color>     <!-- Koyu Turkuaz -->
+    <color name="turkuaz_ana">#1ABC9C</color>      <!-- Ana Turkuaz -->
+    <color name="turkuaz_mint">#3CBEB6</color>     <!-- Mint Turkuaz -->
+    <color name="turkuaz_acik">#D0F0E8</color>     <!-- Açık Turkuaz -->
+    <color name="turkuaz_cok_acik">#D6F0EE</color> <!-- Çok Açık Turkuaz -->
+    <color name="turkuaz_cok_acik2">#C1E7E2</color><!-- Açık Turkuaz 2 -->
+
+    <!-- Diğer Renkler -->
+    <color name="kirmizi">#F44336</color>          <!-- Uyarı/Kapatma -->
     <color name="primary_light">#BBDEFB</color>
 
     <!-- Durum renkleri -->
@@ -28,7 +36,7 @@
     <!-- Arkaplan renkleri -->
     <color name="background">#F5F5F5</color>
     <color name="surface">#FFFFFF</color>
-
+    <color name="blue">#2196F3</color>
     <!-- Metin renkleri -->
     <color name="text_primary">#212121</color>
     <color name="text_secondary">#757575</color>
@@ -50,5 +58,140 @@
 
     <color name="green">#4CAF50</color>
     <color name="red">#F44336</color>
+    <color name="primary">#2196F3</color>
+    <color name="primary_dark">#1976D2</color>
+    <color name="light_primary">#E3F2FD</color>
 
+    <!-- Status Colors -->
+
+    <color name="orange">#FF9800</color>
+
+
+    <color name="green_light">#E8F5E9</color>
+    <color name="red_light">#FFEBEE</color>
+    <color name="yellow_light">#FFF8E1</color>
+
+
+    <!-- Background Colors -->
+    <color name="light_background">#F5F5F5</color>
+
+
+<!-- Primary Colors -->
+<color name="colorPrimary">#2196F3</color>
+<color name="colorPrimaryDark">#1976D2</color>
+<color name="colorAccent">#FF4081</color>
+
+<!-- Text Colors -->
+<color name="textPrimary">#212121</color>
+<color name="textSecondary">#757575</color>
+
+<!-- Status Colors -->
+
+<!-- Item Background Colors -->
+<color name="item_background_paid">#E8F5E9</color>      <!-- Açık yeşil -->
+<color name="item_background_partial">#FFF3E0</color>   <!-- Açık turuncu -->
+<color name="item_background_overdue">#FFEBEE</color>   <!-- Açık kırmızı -->
+<color name="item_background_default">#FAFAFA</color>   <!-- Açık gri -->
+
+<!-- Utility Colors -->
+<color name="colorGreen">#4CAF50</color>
+<color name="colorRed">#F44336</color>
+<color name="colorOrange">#FF9800</color>
+<color name="colorYellow">#FFC107</color>
+    <color name="temp_gradient_start">#FF6B6B</color>
+    <color name="temp_gradient_end">#4ECDC4</color>
+    <color name="humidity_gradient_start">#2196F3</color>
+    <color name="humidity_gradient_end">#03A9F4</color>
+    <color name="humidity_color">#2196F3</color>
+    <color name="background_stroke">#E0E0E0</color>
+
+    <!-- Mevcut renkler -->
+
+    <color name="accent_color">#FF4081</color>
+    <color name="background_gray">#F5F5F5</color>
+    <!-- Mesaj durum renkleri -->
+    <color name="unread_color">#FF4081</color>
+    <color name="read_color">#4CAF50</color>
+    <color name="sent_color">#2196F3</color>
+    <color name="answered_color">#FF9800</color>
+
+    <!-- Arka plan renkleri -->
+    <color name="unread_background">#FFF8E1</color>
+    <color name="read_background">#E8F5E9</color>
+    <color name="sent_background">#E3F2FD</color>
+    <color name="reply_background">#FFF3CD</color>
+    <color name="reminder_background">#FFEAA7</color>
+    <!-- Kenar renkleri -->
+    <color name="unread_border">#FF4081</color>
+    <color name="read_border">#4CAF50</color>
+    <color name="sent_border">#2196F3</color>
+    <color name="reply_border">#FF9800</color>
+    <color name="reminder_border">#FDCB6E</color>
+
+    <!-- Badge renkleri -->
+    <color name="reply_color">#FF9800</color>
+    <color name="reminder_color">#E17055</color>
+
+    <!-- Borç istatistikleri -->
+    <color name="debt_background">#FFEAA7</color>
+    <color name="debt_text">#333333</color>
+    <color name="overdue_color">#E74C3C</color>
+    <color name="pending_color">#F39C12</color>
+    <color name="overdue_background">#FDEDEC</color>
+    <color name="pending_background">#FEF9E7</color>
+
+    <!-- Diğer -->
+    <color name="card_border">#E0E0E0</color>
+    <color name="message_background">#F8F9FA</color>
+    <!-- Mevcut renklerin yanına ekleyin -->
+    <color name="light_blue">#E3F2FD</color>
+    <color name="blue_dark">#1565C0</color>
+    <color name="purple">#9C27B0</color>
+    <color name="colorWarning">#FF9800</color>
+    <color name="divider">#E0E0E0</color>
+    <!-- Modern renk paleti -->
+
+    <!-- Temel renkler -->
+
+    <color name="purple_100">#E1D6F9</color>
+    <color name="status_pending_bg">#fff3e0</color>
+    <color name="status_pending_text">#e65100</color>
+    <color name="status_in_progress_bg">#e3f2fd</color>
+    <color name="status_in_progress_text">#1565c0</color>
+    <color name="status_resolved_bg">#e8f5e8</color>
+    <color name="status_resolved_text">#2e7d32</color>
+    <color name="status_rejected_bg">#ffebee</color>
+    <color name="status_rejected_text">#c62828</color>
+
+    <!-- Temel renkler -->
+
+
+    <!-- Aidat durum renkleri -->
+
+
+    <!-- Status background colors -->
+
+
+    <!-- Item background colors -->
+
+    <color name="text_disabled">#999999</color>
+    <!-- Material Design colors -->
+    <color name="primaryColor">#2196F3</color>
+    <color name="primaryDarkColor">#1976D2</color>
+    <color name="accentColor">#FF9800</color>
+
+
+    <!-- Diğer renkler -->
+
+
+    <!-- Durum renkleri -->
+
+    <color name="status_in_progress">#2962FF</color>
+    <color name="status_resolved">#00C853</color>
+    <color name="status_rejected">#D50000</color>
+
+    <!-- Nötr renkler -->
+
+    <color name="on_surface">#212121</color>
+    <color name="on_surface_light">#757575</color>
 </resources>

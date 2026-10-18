@@ -59,6 +59,10 @@ class GroupedDuesActivity : BaseActivity(), NavigationView.OnNavigationItemSelec
         setContentView(R.layout.activity_grouped_dues)
 
         initViews()
+
+        // BU SATIRI EKLE: BaseActivity'den gelen navigation'ı kullan
+        super.setupNavigation()
+
         setupToolbarAndNavigation()
         setupSpinners()
         setupRecyclerView()
@@ -85,14 +89,12 @@ class GroupedDuesActivity : BaseActivity(), NavigationView.OnNavigationItemSelec
 
     private fun setupToolbarAndNavigation() {
         val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
+
+        // Toolbar'ı ayarla
         setSupportActionBar(toolbar)
         supportActionBar?.title = "Gruplanmış Borçlar"
 
-        // HAMBURGER İKONU İÇİN
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setHomeButtonEnabled(true)
-        supportActionBar?.setDisplayShowHomeEnabled(true)
-
+        // HAMBURGER İKONU İÇİN - Bu kısmı BaseActivity zaten hallediyor
         // ActionBarDrawerToggle
         val toggle = ActionBarDrawerToggle(
             this,
@@ -105,15 +107,20 @@ class GroupedDuesActivity : BaseActivity(), NavigationView.OnNavigationItemSelec
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
 
-        // Navigation listener
-        navigationView.setNavigationItemSelectedListener(this)
+        // Hamburger ikonunu beyaz yap
+        toggle.drawerArrowDrawable.color = resources.getColor(android.R.color.white, null)
 
-        // Header bilgilerini güncelle
-        updateNavigationHeader()
+        // Navigation listener - BaseActivity'den geliyor zaten
+        // navigationView.setNavigationItemSelectedListener(this) // BU SATIR GEREKSİZ
 
-        println("✅ Navigation kuruldu - Hamburger aktif")
+        // Header bilgilerini güncelle - BU KISIM ARTIK GEREKSİZ, BaseActivity hallediyor
+        // updateNavigationHeader()
+
+        println("✅ GroupedDuesActivity: Toolbar ve Navigation ayarlandı")
     }
 
+    // BU METODU SİLİYORUZ - BaseActivity zaten yapıyor
+    /*
     private fun updateNavigationHeader() {
         val headerView = navigationView.getHeaderView(0)
         headerView?.let {
@@ -127,6 +134,7 @@ class GroupedDuesActivity : BaseActivity(), NavigationView.OnNavigationItemSelec
             println("❌ Navigation header bulunamadı!")
         }
     }
+    */
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
@@ -191,19 +199,13 @@ class GroupedDuesActivity : BaseActivity(), NavigationView.OnNavigationItemSelec
                 })
             }
             R.id.nav_logout -> {
-                logoutUser()
+                super.logoutUser()
             }
         }
         drawerLayout.closeDrawer(GravityCompat.START)
         return true
     }
 
-    private fun logoutUser() {
-        Toast.makeText(this, "Çıkış yapılıyor...", Toast.LENGTH_SHORT).show()
-        val intent = Intent(this, MainActivity::class.java)
-        startActivity(intent)
-        finish()
-    }
 
     private fun setupSpinners() {
         // Gruplama türü spinner'ı

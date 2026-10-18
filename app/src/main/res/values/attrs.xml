@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Mevcut drawer attributeleri -->
+    <attr name="drawerHeaderColor" format="reference|color" />
+    <attr name="drawerIconColor" format="reference|color" />
+    <attr name="drawerTextColor" format="reference|color" />
+
+    <!-- ORTAK ATTRIBUTELER -->
+    <attr name="strokeWidth" format="dimension" />
+    <attr name="progressColor" format="color" />
+    <attr name="maxProgress" format="float" />
+    <attr name="showLabel" format="boolean" />
+    <attr name="minValue" format="float" />
+    <attr name="maxValue" format="float" />
+    <attr name="startAngle" format="float" />
+    <attr name="sweepAngle" format="float" />
+    <attr name="backgroundStrokeColor" format="color" />
+
+    <!-- CircularProgressView için -->
+    <declare-styleable name="CircularProgressView">
+        <attr name="progress" format="float" />
+        <attr name="centerText" format="string" />
+        <attr name="labelText" format="string" />
+        <!-- Ortak attributeler -->
+        <attr name="strokeWidth" />
+        <attr name="progressColor" />
+        <attr name="maxProgress" />
+        <attr name="showLabel" />
+    </declare-styleable>
+
+    <!-- CircularSeekBar için -->
+    <declare-styleable name="CircularSeekBar">
+        <attr name="value" format="float" />
+        <attr name="thumbRadius" format="dimension" />
+        <!-- Ortak attributeler -->
+        <attr name="strokeWidth" />
+        <attr name="progressColor" />
+        <attr name="minValue" />
+        <attr name="maxValue" />
+        <attr name="startAngle" />
+        <attr name="sweepAngle" />
+        <attr name="backgroundStrokeColor" />
+    </declare-styleable>
+</resources>

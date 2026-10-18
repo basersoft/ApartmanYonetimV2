@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Site ve Kullanıcı Bilgisi -->
+        <TextView
+            android:id="@+id/tvSiteInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Site: 1"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:id="@+id/tvUserInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Kullanıcı - Daire"
+            android:textSize="14sp"
+            android:layout_marginBottom="8dp"/>
+
+        <!-- Borç Bilgileri -->
+        <TextView
+            android:id="@+id/tvTotalAmount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Toplam Borç: 0.00 ₺"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="4dp"/>
+
+        <TextView
+            android:id="@+id/tvRemainingAmount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Kalan Borç: 0.00 ₺"
+            android:textSize="16sp"
+            android:textColor="@color/colorAccent"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:id="@+id/tvLateFeeInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Gecikme Zammı: 0.00 ₺"
+            android:textSize="14sp"
+            android:textColor="@color/red"
+            android:layout_marginBottom="8dp"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/tvDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Açıklama: "
+            android:textSize="14sp"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Ödeme Tipi Seçimi -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ödeme Tipi"
+            android:textStyle="bold"
+            android:layout_marginBottom="4dp"/>
+
+        <!-- RadioGroup for Payment Type -->
+        <RadioGroup
+            android:id="@+id/rgPaymentType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+
+            <RadioButton
+                android:id="@+id/rbFullPayment"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Tam Ödeme"
+                android:checked="true"/>
+
+            <RadioButton
+                android:id="@+id/rbPartialPayment"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Kısmi Ödeme"/>
+
+        </RadioGroup>
+
+        <!-- Ödeme Tipi Bilgisi -->
+        <TextView
+            android:id="@+id/tvPaymentTypeInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="📋 Tam ödeme seçildi"
+            android:textSize="14sp"
+            android:textColor="@color/colorPrimary"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Ödeme Tutarı -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ödeme Tutarı"
+            android:textStyle="bold"
+            android:layout_marginBottom="4dp"/>
+
+        <!-- BU ÇOK ÖNEMLİ: İLK DURUMDA KİLİTLİ -->
+        <EditText
+            android:id="@+id/etPaymentAmount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:hint="0.00"
+            android:textSize="18sp"
+            android:layout_marginBottom="8dp"
+            android:enabled="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"/>
+
+        <!-- Hızlı Tutar Butonları -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+
+            <Button
+                android:id="@+id/btnFullAmount"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Tamamı"
+                android:layout_marginEnd="4dp"/>
+
+            <Button
+                android:id="@+id/btnHalfAmount"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Yarısı"
+                android:layout_marginEnd="4dp"/>
+
+            <Button
+                android:id="@+id/btnQuarterAmount"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Çeyreği"/>
+
+        </LinearLayout>
+
+        <!-- Ödeme Yöntemi -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ödeme Yöntemi"
+            android:textStyle="bold"
+            android:layout_marginBottom="4dp"/>
+
+        <Spinner
+            android:id="@+id/spPaymentMethod"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Notlar -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Notlar (Opsiyonel)"
+            android:textStyle="bold"
+            android:layout_marginBottom="4dp"/>
+
+        <EditText
+            android:id="@+id/etNotes"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:inputType="textMultiLine"
+            android:gravity="top"
+            android:hint="Ödeme ile ilgili notlar..."
+            android:layout_marginBottom="24dp"/>
+
+        <!-- Progress Bar -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Butonlar -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <Button
+                android:id="@+id/btnIptal"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="İptal"
+                android:layout_marginEnd="8dp"/>
+
+            <Button
+                android:id="@+id/btnOdemeYap"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="ÖDEMEYİ YAP"
+                android:backgroundTint="@color/colorPrimary"
+                android:textColor="@android:color/white"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

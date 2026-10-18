@@ -7,8 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import org.json.JSONArray
 import org.json.JSONObject
-import com.baser.apartman.widgets.DuyuruWidgetUtils // widgets paketinden import
-import com.baser.apartman.workers.WidgetUpdateWorker
+
 class DuyurularActivity : BaseActivity() {
 
     private lateinit var adapter: DuyuruAdapter
@@ -24,7 +23,7 @@ class DuyurularActivity : BaseActivity() {
         setupNavigation()
         setupBottomNavigation()
         setupViews()
-        loadDuyurularFromServer() // API'den gerçek verileri yükle
+        loadDuyurularFromServer()
     }
 
     private fun setupViews() {
@@ -55,7 +54,7 @@ class DuyurularActivity : BaseActivity() {
                 progressBar.visibility = android.view.View.GONE
                 Toast.makeText(this, "Duyuru yükleme hatası: $error", Toast.LENGTH_LONG).show()
                 println("🔍 DUYURULAR HATA: $error")
-                showSampleData() // Hata durumunda örnek veri göster
+                showSampleData()
             }
         )
     }
@@ -73,41 +72,43 @@ class DuyurularActivity : BaseActivity() {
 
                 println("🔍 TOPLAM DUYURU: ${duyuruArray.length()}")
 
-                // WIDGET İÇİN DEĞİŞKENLER
                 var sonDuyuruBaslik = ""
                 var sonDuyuruIcerik = ""
                 var sonDuyuruTarih = ""
                 var toplamDuyuruSayisi = duyuruArray.length()
-                var yeniDuyuruVar = false
 
                 for (i in 0 until duyuruArray.length()) {
                     val item = duyuruArray.getJSONObject(i)
 
                     // SON DUYURUYU AL
-                    if (i == 0) { // En yeni duyuru ilk sırada
+                    if (i == 0) {
                         sonDuyuruBaslik = item.getString("baslik")
                         sonDuyuruIcerik = item.getString("icerik")
                         sonDuyuruTarih = item.getString("tarih")
                     }
 
+                    // Resim URL'sini al
+                    val resimUrl = item.optString("resim_url", "")
+                    println("🔍 DUYURU $i - Başlık: ${item.getString("baslik")}, Resim URL: $resimUrl")
+
                     val duyuru = Duyuru(
                         baslik = item.getString("baslik"),
                         icerik = item.getString("icerik"),
-                        tarih = item.getString("tarih")
+                        tarih = item.getString("tarih"),
+                        resimUrl = resimUrl
                     )
                     duyuruList.add(duyuru)
-                    println("🔍 DUYURU EKLENDİ: ${duyuru.baslik}")
                 }
 
                 adapter.setDuyuruList(duyuruList)
 
-                // WIDGET'I GÜNCELLE
-                updateWidgetWithDuyuruData(
-                    sonBaslik = sonDuyuruBaslik,
-                    sonIcerik = sonDuyuruIcerik,
-                    sonTarih = sonDuyuruTarih,
-                    toplamDuyuruSayisi = toplamDuyuruSayisi
-                )
+                // Widget güncellemeyi geçici olarak kaldırdık
+                // updateWidgetWithDuyuruData(
+                //     sonBaslik = sonDuyuruBaslik,
+                //     sonIcerik = sonDuyuruIcerik,
+                //     sonTarih = sonDuyuruTarih,
+                //     toplamDuyuruSayisi = toplamDuyuruSayisi
+                // )
 
                 if (duyuruList.isEmpty()) {
                     val message = jsonObject.optString("message", "Henüz hiç duyuru bulunmamaktadır")
@@ -130,7 +131,8 @@ class DuyurularActivity : BaseActivity() {
         }
     }
 
-    // WIDGET GÜNCELLEME FONKSİYONU
+    // Widget güncelleme fonksiyonunu geçici olarak yorum satırı yapalım
+    /*
     private fun updateWidgetWithDuyuruData(
         sonBaslik: String,
         sonIcerik: String,
@@ -141,18 +143,15 @@ class DuyurularActivity : BaseActivity() {
             val sharedPreferences = getSharedPreferences("duyuru_widget_prefs", android.content.Context.MODE_PRIVATE)
             val editor = sharedPreferences.edit()
 
-            // Kullanıcı bilgilerini kaydet
             editor.putString("user_email", userEmail ?: "")
             editor.putString("user_type", userType ?: "user")
             editor.putString("user_name", userName ?: "")
 
-            // Duyuru bilgilerini kaydet
             editor.putString("son_duyuru_baslik", sonBaslik)
             editor.putString("son_duyuru_icerik", sonIcerik)
             editor.putString("son_duyuru_tarih", sonTarih)
             editor.putInt("toplam_duyuru_sayisi", toplamDuyuruSayisi)
 
-            // Widget mesajını oluştur
             val widgetMesaj = when {
                 toplamDuyuruSayisi > 0 -> {
                     val kisaBaslik = if (sonBaslik.length > 20) sonBaslik.substring(0, 20) + "..." else sonBaslik
@@ -164,22 +163,19 @@ class DuyurularActivity : BaseActivity() {
 
             editor.apply()
 
-            // Widget'ı güncelle - widgets paketinden
-            DuyuruWidgetUtils.updateWidgets(this)
+            // DuyuruWidgetUtils.updateWidgets(this) // Bu satır hata veriyor
 
             println("🔍 DUYURU WIDGET GÜNCELLENDİ: $widgetMesaj")
-            println("🔍 KAYITLI EMAIL: ${sharedPreferences.getString("user_email", "BULUNAMADI")}")
 
         } catch (e: Exception) {
             println("🔍 DUYURU WIDGET GÜNCELLEME HATASI: ${e.message}")
-            e.printStackTrace()
         }
     }
+    */
 
     private fun showSampleData() {
         println("🔍 ÖRNEK DUYURULAR GÖSTERİLİYOR")
 
-        // Örnek duyurular (API çalışmazsa gösterilecek)
         val ornekDuyurular = listOf(
             Duyuru("Yeni Aidat Sistemi", "Aidatlar artık online ödenebilir. Site yönetim panelinden ödeme yapabilirsiniz.", "15 Ocak 2024"),
             Duyuru("Asansör Bakım Çalışması", "Pazar günü 09:00-17:00 saatleri arasında asansör bakımı yapılacaktır.", "10 Ocak 2024"),
@@ -188,13 +184,15 @@ class DuyurularActivity : BaseActivity() {
 
         adapter.setDuyuruList(ornekDuyurular)
 
-        // Örnek veriler için de widget'ı güncelle
+        // Widget güncellemeyi de kaldırdık
+        /*
         updateWidgetWithDuyuruData(
             sonBaslik = "Yeni Aidat Sistemi",
             sonIcerik = "Aidatlar artık online ödenebilir.",
             sonTarih = "15 Ocak 2024",
             toplamDuyuruSayisi = 3
         )
+        */
 
         Toast.makeText(this, "Örnek veriler gösteriliyor", Toast.LENGTH_SHORT).show()
     }

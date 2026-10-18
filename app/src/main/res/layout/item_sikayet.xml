@@ -203,7 +203,69 @@
                     android:layout_marginTop="4dp" />
 
             </LinearLayout>
+            <!-- item_sikayet.xml dosyanıza bu kısmı ekleyin -->
+            <LinearLayout
+                android:id="@+id/adminActionsLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:padding="8dp"
+                android:layout_marginTop="8dp"
+                android:background="#f5f5f5"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp">
 
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Yönetici İşlemleri"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="#6200EE"
+                    android:layout_marginBottom="4dp" />
+
+                <Button
+                    android:id="@+id/btnAdminInProgress"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:text="İnceleniyor"
+                    android:textSize="12sp"
+                    android:backgroundTint="#2962FF"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginBottom="2dp" />
+
+                <Button
+                    android:id="@+id/btnAdminResolved"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:text="Çözüldü"
+                    android:textSize="12sp"
+                    android:backgroundTint="#00C853"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginBottom="2dp" />
+
+                <Button
+                    android:id="@+id/btnAdminRejected"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:text="Reddedildi"
+                    android:textSize="12sp"
+                    android:backgroundTint="#D50000"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginBottom="2dp" />
+
+                <Button
+                    android:id="@+id/btnAdminDelete"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:text="Sil"
+                    android:textSize="12sp"
+                    android:backgroundTint="#757575"
+                    android:textColor="#FFFFFF" />
+
+
+            </LinearLayout>
         </LinearLayout>
 
     </LinearLayout>

@@ -1,26 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<!-- Diğer string'leriniz varsa burada kalacak -->
-<!-- Eski string'leri silmeyin, sadece yeni ekleyin -->
-<string name="app_name">Apartman Yonetim</string>
-<string name="navigation_drawer_open">Menüyü aç</string>
-<string name="navigation_drawer_close">Menüyü kapat</string>
+    <!-- Diğer string'leriniz varsa burada kalacak -->
+    <string name="app_name">Apartman Yonetim</string>
+    <string name="navigation_drawer_open">Menüyü aç</string>
+    <string name="navigation_drawer_close">Menüyü kapat</string>
 
-<!-- Diğer mevcut string'leriniz... -->
+    <!-- User Types - UserManagementActivity'de kullanılan sıraya göre düzenle -->
+    <!-- Not: Kodda sıra: 0:resident, 1:manager, 2:admin -->
     <string-array name="user_types">
         <item>Sakin</item>
+        <item>Sorumlu</item>
         <item>Yönetici</item>
-        <item>Admin</item>
     </string-array>
 
+    <!-- Resident Types - Kodda: 0:owner, 1:tenant -->
     <string-array name="resident_types">
         <item>Ev Sahibi</item>
         <item>Kiracı</item>
     </string-array>
 
+    <string name="varsayilan_uyku_mesaji">Şu anda uyku modundayım. Acil bir durum varsa mesaj atabilirsiniz.</string>
+    <!-- Dues Responsibility - Kodda: 0:yes, 1:no -->
     <string-array name="dues_responsibility">
-        <item>Aidat Öder</item>
-        <item>Aidat Ödemez</item>
+        <item>Öder</item>
+        <item>Ödemez</item>
+    </string-array>
+
+    <!-- Status Types - Yeni ekle: Kodda: 0:active, 1:inactive, 2:pending -->
+    <string-array name="status_types">
+        <item>Aktif</item>
+        <item>Pasif</item>
+        <item>Beklemede</item>
+    </string-array>
+
+    <!-- Receive Reminders - Yeni ekle: Kodda: 0:yes, 1:no -->
+    <string-array name="receive_reminders">
+        <item>Alır</item>
+        <item>Almaz</item>
     </string-array>
 
     <!-- User Management Strings -->
@@ -35,4 +51,9 @@
     <string name="delete_user_confirmation">%s kullanıcısını silmek istediğinizden emin misiniz?</string>
     <string name="cancel">İptal</string>
     <string name="widget_description">Aidat durumunu gösterir</string>
+    <string name="forgot_password">Şifremi Unuttum</string>
+    <string name="register">Yeni Kayıt Ol</string>
+    <string name="back_to_login">Giriş Ekranına Dön</string>
+
+
 </resources>
