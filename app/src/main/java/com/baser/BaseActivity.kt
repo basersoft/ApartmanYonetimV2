@@ -122,16 +122,16 @@ open class BaseActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             println("❌ Toolbar veya DrawerLayout bulunamadı")
         }
 
-        // Menü altındaki copyright satırına otomatik sürüm özetini yaz
-        // (ör: "v1.6.4 • kod 4 • 2026-10-23 00:20 — © 2026 Abdullah BAŞER")
+        // Menü altındaki copyright bloğuna (2 satır) otomatik sürüm özetini yaz:
+        // 1. satır: © isim   2. satır: v1.6.2 (5) • Derleme 2026-10-23 00:16
         try {
             val copyrightItem = navigationView.menu.findItem(R.id.nav_copyright)
-            copyrightItem?.title = buildString {
-                append("v").append(BuildConfig.VERSION_NAME)
-                append(" • kod ").append(BuildConfig.VERSION_CODE)
-                append(" • ").append(BuildConfig.BUILD_TIME.substringBefore('.'))
-                append("\n© 2026 Abdullah BAŞER Apartman Yönetimi")
-            }
+            copyrightItem?.actionView?.let { actionView ->
+                actionView.findViewById<TextView>(R.id.tvVersion)?.text =
+                    "v" + BuildConfig.VERSION_NAME +
+                    " (" + BuildConfig.VERSION_CODE + ") • Derleme " +
+                    BuildConfig.BUILD_TIME.substringBefore('.')
+            } ?: println("⚠️ Copyright actionView bulunamadı")
         } catch (e: Exception) {
             println("⚠️ Sürüm bilgisi menüye yazılamadı: ${e.message}")
         }

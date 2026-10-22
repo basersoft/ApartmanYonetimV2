@@ -106,13 +106,14 @@
             android:title="Çıkış Yap" />
     </group>
 
-    <!-- Copyright - tıklanamaz -->
+    <!-- Copyright + surum - tiklanamaz (2 satir: isim altinda surum) -->
     <group>
         <item
             android:id="@+id/nav_copyright"
-            android:title="© 2026 Abdullah BAŞER Apartman Yönetimi"
+            android:title=""
             android:enabled="false"
-            android:clickable="false" />
+            android:clickable="false"
+            app:actionLayout="@layout/menu_copyright_view" />
     </group>
 
 </menu>
