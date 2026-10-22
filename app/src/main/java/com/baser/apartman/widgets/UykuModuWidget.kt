@@ -21,7 +21,6 @@ class UykuModuWidget : AppWidgetProvider() {
     companion object {
         const val ACTION_TOGGLE = "com.baser.apartman.TOGGLE_UYKU_MODU"
         const val ACTION_UPDATE_WIDGET = "com.baser.apartman.UPDATE_WIDGET"
-        const val ACTION_OPEN_ACTIVITY = "com.baser.apartman.OPEN_NAMAZ_ACTIVITY"
         private const val TAG = "UykuModuWidget"
     }
 
@@ -44,11 +43,6 @@ class UykuModuWidget : AppWidgetProvider() {
                 toggleUykuModu(context)
                 updateAllWidgets(context)
             }
-            ACTION_OPEN_ACTIVITY -> {
-                val openIntent = Intent(context, NamazVakitleriActivity::class.java)
-                openIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                context.startActivity(openIntent)
-            }
             ACTION_UPDATE_WIDGET -> {
                 updateAllWidgets(context)
             }
@@ -60,6 +54,8 @@ class UykuModuWidget : AppWidgetProvider() {
     }
 
     private fun ensureGeriSayimServisiRunning(context: Context) {
+        if (GeriSayimServisi.isRunning) return
+
         val prefs = context.getSharedPreferences("rahatsiz_etme_modu", Context.MODE_PRIVATE)
         val isActive = prefs.getBoolean("aktif", false)
 
@@ -72,10 +68,14 @@ class UykuModuWidget : AppWidgetProvider() {
             }
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.startForegroundService(geriSayimIntent)
-        } else {
-            context.startService(geriSayimIntent)
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(geriSayimIntent)
+            } else {
+                context.startService(geriSayimIntent)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "GeriSayimServisi arka planda başlatılamadı: ${e.message}")
         }
     }
 
@@ -206,25 +206,18 @@ class UykuModuWidget : AppWidgetProvider() {
         views.setOnClickPendingIntent(R.id.btnToggle, togglePendingIntent)
 
         // 2. WIDGET LAYOUT TIKLAMASI (NamazVakitleriActivity'e git)
-        val openIntent = Intent(context, UykuModuWidget::class.java).apply {
-            action = ACTION_OPEN_ACTIVITY
+        // Doğrudan activity PendingIntent kullanılır; receiver icinden startActivity
+        // Android 10+ arka plan kisiti nedeniyle calismaz.
+        val openIntent = Intent(context, NamazVakitleriActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
         }
 
-        val openPendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            PendingIntent.getBroadcast(
-                context,
-                appWidgetId + 1000,
-                openIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
-            )
-        } else {
-            PendingIntent.getBroadcast(
-                context,
-                appWidgetId + 1000,
-                openIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT
-            )
-        }
+        val openPendingIntent = PendingIntent.getActivity(
+            context,
+            appWidgetId + 1000,
+            openIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
         views.setOnClickPendingIntent(R.id.widgetLayout, openPendingIntent)
 
         appWidgetManager.updateAppWidget(appWidgetId, views)

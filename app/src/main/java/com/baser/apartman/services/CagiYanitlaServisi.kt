@@ -21,6 +21,7 @@ class CagiYanitlaServisi : Service() {
 
     private lateinit var telephonyManager: TelephonyManager
     private lateinit var telecomManager: TelecomManager
+    private var phoneStateListener: PhoneStateListener? = null
     private var isServiceRunning = false
     private var incomingNumber: String? = null
 
@@ -74,7 +75,7 @@ class CagiYanitlaServisi : Service() {
                 return
             }
 
-            val phoneStateListener = object : PhoneStateListener() {
+            val listener = object : PhoneStateListener() {
                 override fun onCallStateChanged(state: Int, phoneNumber: String?) {
                     super.onCallStateChanged(state, phoneNumber)
 
@@ -113,7 +114,8 @@ class CagiYanitlaServisi : Service() {
                 }
             }
 
-            telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE)
+            phoneStateListener = listener
+            telephonyManager.listen(listener, PhoneStateListener.LISTEN_CALL_STATE)
             Log.d("CagiYanitlaServisi", "✅ Çağrı dinleyici başlatıldı")
 
         } catch (e: Exception) {
@@ -187,7 +189,10 @@ class CagiYanitlaServisi : Service() {
 
         // Telefon dinleyicisini durdur
         try {
-            telephonyManager.listen(object : PhoneStateListener() {}, PhoneStateListener.LISTEN_NONE)
+            phoneStateListener?.let {
+                telephonyManager.listen(it, PhoneStateListener.LISTEN_NONE)
+            }
+            phoneStateListener = null
         } catch (e: Exception) {
             // Ignore
         }

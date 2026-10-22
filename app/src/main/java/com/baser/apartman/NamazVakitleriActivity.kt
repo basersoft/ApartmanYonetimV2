@@ -30,7 +30,7 @@ import com.google.android.material.switchmaterial.SwitchMaterial
 import java.text.SimpleDateFormat
 import java.util.*
 import com.baser.apartman.widgets.UykuModuWidget
-class NamazVakitleriActivity : AppCompatActivity() {
+class NamazVakitleriActivity : BaseActivity() {
 
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
@@ -77,7 +77,7 @@ class NamazVakitleriActivity : AppCompatActivity() {
         setupListeners()
     }
 
-    private fun setupBottomNavigation() {
+    override fun setupBottomNavigation() {
         val bottomNav = findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(R.id.bottom_navigation)
 
         bottomNav.setOnNavigationItemSelectedListener { menuItem ->
@@ -108,46 +108,10 @@ class NamazVakitleriActivity : AppCompatActivity() {
     }
 
     private fun setupMenu() {
-        drawerLayout = findViewById(R.id.drawer_layout)
-        navigationView = findViewById(R.id.navigation_view)
-        toolbar = findViewById(R.id.toolbar)
-
-        setSupportActionBar(toolbar)
+        // BaseActivity.setupNavigation: toolbar + drawer + TÜM menü öğeleri
+        // (diğer sayfalarla aynı ortak yapı; her öğe user_email/user_type/user_name ile açılır)
+        setupNavigation()
         supportActionBar?.title = "🕌 Namaz Vakitleri"
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setDisplayShowHomeEnabled(true)
-
-        val toggle = ActionBarDrawerToggle(
-            this, drawerLayout, toolbar,
-            R.string.navigation_drawer_open,
-            R.string.navigation_drawer_close
-        )
-        drawerLayout.addDrawerListener(toggle)
-        toggle.syncState()
-        toggle.drawerArrowDrawable.color = resources.getColor(android.R.color.white, null)
-
-        navigationView.setNavigationItemSelectedListener { menuItem ->
-            when (menuItem.itemId) {
-                R.id.nav_dashboard -> startActivity(Intent(this, DashboardActivity::class.java))
-                R.id.nav_profil -> startActivity(Intent(this, ProfilActivity::class.java))
-                R.id.nav_duyurular -> startActivity(Intent(this, DuyurularActivity::class.java))
-                R.id.nav_aidat -> startActivity(Intent(this, AidatActivity::class.java))
-                R.id.nav_sikayetler -> startActivity(Intent(this, SikayetlerActivity::class.java))
-                R.id.nav_uyku_modu -> startActivity(Intent(this, UykuModuActivity::class.java))
-                R.id.nav_messages -> startActivity(Intent(this, MessagesActivity::class.java))
-                R.id.nav_logout -> logout()
-            }
-            drawerLayout.closeDrawer(GravityCompat.START)
-            true
-        }
-
-        toolbar.setNavigationOnClickListener {
-            if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                drawerLayout.closeDrawer(GravityCompat.START)
-            } else {
-                drawerLayout.openDrawer(GravityCompat.START)
-            }
-        }
     }
 
     private fun logout() {

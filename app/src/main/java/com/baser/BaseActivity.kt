@@ -121,6 +121,20 @@ open class BaseActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         } else {
             println("❌ Toolbar veya DrawerLayout bulunamadı")
         }
+
+        // Menü altındaki copyright satırına otomatik sürüm özetini yaz
+        // (ör: "v1.6.4 • kod 4 • 2026-10-23 00:20 — © 2026 Abdullah BAŞER")
+        try {
+            val copyrightItem = navigationView.menu.findItem(R.id.nav_copyright)
+            copyrightItem?.title = buildString {
+                append("v").append(BuildConfig.VERSION_NAME)
+                append(" • kod ").append(BuildConfig.VERSION_CODE)
+                append(" • ").append(BuildConfig.BUILD_TIME.substringBefore('.'))
+                append("\n© 2026 Abdullah BAŞER Apartman Yönetimi")
+            }
+        } catch (e: Exception) {
+            println("⚠️ Sürüm bilgisi menüye yazılamadı: ${e.message}")
+        }
     }
 
     protected fun setupProfileImageListeners() {

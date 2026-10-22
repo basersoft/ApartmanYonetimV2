@@ -1,7 +1,35 @@
-﻿plugins {
+﻿import java.util.Properties
+import java.text.SimpleDateFormat
+import java.util.Date
+
+plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
 }
+
+// === OTOMATIK SURUM ===
+// version.properties dosyasindaki PATCH her derlemede +1 artar.
+// versionName = MAJOR.MINOR.PATCH  (orn: 1.6.14)
+// versionCode = CODE               (her derlemede +1, magaza icin sirali)
+val versionPropsFile = rootProject.file("version.properties")
+val versionProps = Properties()
+versionPropsFile.inputStream().use { stream -> versionProps.load(stream) }
+val vMajor = (versionProps.getProperty("MAJOR") ?: "1").toInt()
+val vMinor = (versionProps.getProperty("MINOR") ?: "0").toInt()
+var vPatch = (versionProps.getProperty("PATCH") ?: "0").toInt()
+var vCode = (versionProps.getProperty("CODE") ?: "1").toInt()
+val buildTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date())
+val isCiIncrement = gradle.startParameter.taskNames.any {
+    it.contains("assemble", true) || it.contains("bundle", true)
+}
+if (isCiIncrement) {
+    vPatch += 1
+    vCode += 1
+    versionProps.setProperty("PATCH", vPatch.toString())
+    versionProps.setProperty("CODE", vCode.toString())
+    versionPropsFile.outputStream().use { stream -> versionProps.store(stream, null) }
+}
+val appVersionName = "$vMajor.$vMinor.$vPatch"
 
 android {
     namespace = "com.baser.apartman"
@@ -11,10 +39,14 @@ android {
         applicationId = "com.baser.apartman"
         minSdk = 21
         targetSdk = 35
-        versionCode = 2
-        versionName = "1.6"
+        versionCode = vCode
+        versionName = appVersionName
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "VERSION_NAME", "\"$appVersionName\"")
+        buildConfigField("int", "VERSION_CODE", "$vCode")
+        buildConfigField("String", "BUILD_TIME", "\"$buildTime\"")
     }
 
     buildTypes {
@@ -37,6 +69,10 @@ android {
 
     kotlinOptions {
         jvmTarget = "1.8"
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
 }

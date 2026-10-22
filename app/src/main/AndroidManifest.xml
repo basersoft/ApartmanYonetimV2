@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -130,18 +131,6 @@
             android:theme="@style/Theme.MaterialComponents.Light.DarkActionBar"
             android:exported="false" />
 
-        <activity
-            android:name=".ExpenseDetailsActivity"
-            android:label="Harcama Detayları"
-            android:parentActivityName=".SharedExpensesActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".AddSharedExpenseActivity"
-            android:label="Yeni Harcama"
-            android:parentActivityName=".SharedExpensesActivity"
-            android:exported="false" />
-
         <!-- API Ayarları Activity -->
         <activity
             android:name=".ApiSettingsActivity"
@@ -208,36 +197,45 @@
         <!-- Servisler -->
         <service android:name=".NotificationService" />
 
-        <service
-            android:name=".LocationForegroundService"
-            android:enabled="true"
-            android:exported="false" />
-
-        <service
-            android:name=".GeofenceForegroundService"
-            android:enabled="true"
-            android:exported="false" />
-
         <!-- Garaj Servisi -->
         <service
             android:name=".GarajService"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.foreground_service_type_special_use"
+                android:value="garage_control" />
+        </service>
         <service
-            android:name=".service.CagiYanitlaServisi"
+            android:name=".CagiYanitlaServisi"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.foreground_service_type_special_use"
+                android:value="call_filtering" />
+        </service>
         <!-- Namaz Vakitleri Servisi ve Receiver -->
         <service
             android:name=".NamazVaktiServisi"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.foreground_service_type_special_use"
+                android:value="namaz_vakti_tracking" />
+        </service>
         <!-- Namaz Vakitleri Receiver -->
         <service
             android:name=".GeriSayimServisi"
             android:enabled="true"
             android:exported="false"
-            android:foregroundServiceType="dataSync" />
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.foreground_service_type_special_use"
+                android:value="widget_countdown" />
+        </service>
         <receiver
             android:name=".NamazVaktiReceiver"
             android:enabled="true"

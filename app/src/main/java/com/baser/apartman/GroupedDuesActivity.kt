@@ -90,33 +90,10 @@ class GroupedDuesActivity : BaseActivity(), NavigationView.OnNavigationItemSelec
     private fun setupToolbarAndNavigation() {
         val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
 
-        // Toolbar'ı ayarla
-        setSupportActionBar(toolbar)
+        // Toolbar + drawer + TÜM menü öğeleri BaseActivity.setupNavigation ile kurulur.
+        // (Kendi ActionBarDrawerToggle'ımızı kurmak toolbar davranışını bozuyordu ve
+        //  eksik override tüm sayfalara tıklanamaz hale getiriyordu.)
         supportActionBar?.title = "Gruplanmış Borçlar"
-
-        // HAMBURGER İKONU İÇİN - Bu kısmı BaseActivity zaten hallediyor
-        // ActionBarDrawerToggle
-        val toggle = ActionBarDrawerToggle(
-            this,
-            drawerLayout,
-            toolbar,
-            R.string.navigation_drawer_open,
-            R.string.navigation_drawer_close
-        )
-
-        drawerLayout.addDrawerListener(toggle)
-        toggle.syncState()
-
-        // Hamburger ikonunu beyaz yap
-        toggle.drawerArrowDrawable.color = resources.getColor(android.R.color.white, null)
-
-        // Navigation listener - BaseActivity'den geliyor zaten
-        // navigationView.setNavigationItemSelectedListener(this) // BU SATIR GEREKSİZ
-
-        // Header bilgilerini güncelle - BU KISIM ARTIK GEREKSİZ, BaseActivity hallediyor
-        // updateNavigationHeader()
-
-        println("✅ GroupedDuesActivity: Toolbar ve Navigation ayarlandı")
     }
 
     // BU METODU SİLİYORUZ - BaseActivity zaten yapıyor
@@ -151,59 +128,10 @@ class GroupedDuesActivity : BaseActivity(), NavigationView.OnNavigationItemSelec
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.nav_dashboard -> {
-                startActivity(Intent(this, DashboardActivity::class.java).apply {
-                    putExtra("user_email", userEmail)
-                    putExtra("user_type", userType)
-                    putExtra("user_name", userName)
-                })
-            }
-            R.id.nav_duyurular -> {
-                startActivity(Intent(this, DuyurularActivity::class.java).apply {
-                    putExtra("user_email", userEmail)
-                    putExtra("user_type", userType)
-                    putExtra("user_name", userName)
-                })
-            }
-            R.id.nav_aidat -> {
-                startActivity(Intent(this, AidatActivity::class.java).apply {
-                    putExtra("user_email", userEmail)
-                    putExtra("user_type", userType)
-                    putExtra("user_name", userName)
-                })
-            }
-            R.id.nav_sikayetler -> {
-                startActivity(Intent(this, SikayetlerActivity::class.java).apply {
-                    putExtra("user_email", userEmail)
-                    putExtra("user_type", userType)
-                    putExtra("user_name", userName)
-                })
-            }
-            R.id.nav_gruplanmis_borclar -> {
-                // Zaten bu sayfadayız
-                Toast.makeText(this, "Zaten Gruplanmış Borçlar sayfasındasınız", Toast.LENGTH_SHORT).show()
-            }
-            R.id.nav_profil -> {
-                startActivity(Intent(this, ProfilActivity::class.java).apply {
-                    putExtra("user_email", userEmail)
-                    putExtra("user_type", userType)
-                    putExtra("user_name", userName)
-                })
-            }
-            R.id.nav_settings -> {
-                startActivity(Intent(this, SettingsActivity::class.java).apply {
-                    putExtra("user_email", userEmail)
-                    putExtra("user_type", userType)
-                    putExtra("user_name", userName)
-                })
-            }
-            R.id.nav_logout -> {
-                super.logoutUser()
-            }
-        }
-        drawerLayout.closeDrawer(GravityCompat.START)
-        return true
+        // BaseActivity'nin TAM menü haritası kullanılır
+        // (bu sınıftaki eski eksik override, hava durumu/toplu harcama/uyku modu vb.
+        //  öğelerin hiçbir işe yaramamasına neden oluyordu)
+        return super.onNavigationItemSelected(item)
     }
 
 

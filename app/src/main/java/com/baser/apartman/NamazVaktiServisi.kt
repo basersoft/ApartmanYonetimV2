@@ -9,6 +9,7 @@ import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import com.baser.apartman.widgets.UykuModuWidget
 
 class NamazVaktiServisi : Service() {
 
@@ -172,7 +173,9 @@ class NamazVaktiServisi : Service() {
     }
 
     private fun updateWidget() {
-        val intent = Intent("com.baser.apartman.UPDATE_WIDGET")
+        val intent = Intent(this, UykuModuWidget::class.java).apply {
+            action = UykuModuWidget.ACTION_UPDATE_WIDGET
+        }
         sendBroadcast(intent)
         Log.d(TAG, "🔄 Widget güncelleme isteği gönderildi")
     }

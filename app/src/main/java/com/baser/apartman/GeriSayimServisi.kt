@@ -30,7 +30,7 @@ class GeriSayimServisi : Service() {
     companion object {
         private const val TAG = "GeriSayimServisi"
         var isRunning = false
-        private const val NOTIFICATION_ID = 1002
+        private const val NOTIFICATION_ID = 1005
         private const val CHANNEL_ID = "geri_sayim_channel"
     }
 
